@@ -46,12 +46,22 @@ export default function Login({ onLoginSuccess, isDark, onToggleTheme }) {
   const [verificationRequired, setVerificationRequired] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState('');
 
+  // Success toast popup state
+  const [successToast, setSuccessToast] = useState({ visible: false, message: '' });
+
+  const showSuccessToast = (message, duration = 4000) => {
+    setSuccessToast({ visible: true, message });
+    setTimeout(() => {
+      setSuccessToast({ visible: false, message: '' });
+    }, duration);
+  };
+
   // Handle email verification redirect query params on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const verified = params.get('verified');
     if (verified === 'success') {
-      setSuccessMsg('Email verified successfully! You can now log in.');
+      showSuccessToast('Email verified successfully! You can now log in.');
       setActiveTab('login');
       window.history.replaceState({}, document.title, window.location.pathname);
     } else if (verified === 'invalid') {
@@ -153,6 +163,7 @@ export default function Login({ onLoginSuccess, isDark, onToggleTheme }) {
       }
 
       if (activeTab === 'signup') {
+        showSuccessToast('Registration successful! Verification email sent.');
         setSuccessMsg('Registration successful! Verification email sent.');
         setRegisteredEmail(username);
         // Clear forms
@@ -248,6 +259,12 @@ export default function Login({ onLoginSuccess, isDark, onToggleTheme }) {
             Back to Sign In
           </button>
         </div>
+        {successToast.visible && (
+          <div className="toast-success-banner">
+            <span style={{ fontSize: '1.2rem' }}>✅</span>
+            <span>{successToast.message}</span>
+          </div>
+        )}
       </div>
     );
   }
@@ -661,6 +678,12 @@ export default function Login({ onLoginSuccess, isDark, onToggleTheme }) {
           )}
         </div>
       </div>
+      {successToast.visible && (
+        <div className="toast-success-banner">
+          <span style={{ fontSize: '1.2rem' }}>✅</span>
+          <span>{successToast.message}</span>
+        </div>
+      )}
     </div>
   );
 }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Spinner from './Spinner';
 import { API_BASE } from '../config';
 
-export default function SendMailModal({ isOpen, onClose, enquiry, token }) {
+export default function SendMailModal({ isOpen, onClose, enquiry, token, showSuccessToast }) {
   const [toEmail, setToEmail] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
@@ -120,6 +120,9 @@ export default function SendMailModal({ isOpen, onClose, enquiry, token }) {
       }
 
       setSuccessMsg('Email sent successfully to the client!');
+      if (showSuccessToast) {
+        showSuccessToast('Email sent successfully to the client!');
+      }
       setTimeout(() => {
         onClose();
       }, 1500);

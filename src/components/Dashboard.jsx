@@ -363,7 +363,12 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
   // Success toast popup state
   const [successToast, setSuccessToast] = useState({ visible: false, message: '' });
 
-
+  const showSuccessToast = (message, duration = 3000) => {
+    setSuccessToast({ visible: true, message });
+    setTimeout(() => {
+      setSuccessToast({ visible: false, message: '' });
+    }, duration);
+  };
 
   const isAdmin = userRole === 'Admin';
 
@@ -515,6 +520,16 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
 
       await fetchEnquiries();
       setIsMilestoneModalOpen(false);
+      
+      let successMsg = 'Milestones updated successfully!';
+      if (sendClientEmail && sendFprEmail) {
+        successMsg = 'Milestones saved & emails sent to client & FPR successfully!';
+      } else if (sendClientEmail) {
+        successMsg = 'Milestones saved & client email sent successfully!';
+      } else if (sendFprEmail) {
+        successMsg = 'Milestones saved & FPR email sent successfully!';
+      }
+      showSuccessToast(successMsg);
     } catch (err) {
       alert(err.message || 'Failed to save milestones');
     } finally {
@@ -1065,6 +1080,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
           setEnquiryForGantt(null);
         }}
         enquiry={enquiryForGantt}
+        showSuccessToast={showSuccessToast}
       />
 
       {/* Recycle Bin Modal */}
@@ -1084,6 +1100,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
         }}
         enquiry={enquiryForCustomMail}
         token={token}
+        showSuccessToast={showSuccessToast}
       />
 
       {/* Toast Success Message */}

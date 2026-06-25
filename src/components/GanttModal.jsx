@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE } from '../config';
 
-export default function GanttModal({ isOpen, onClose, enquiry }) {
+export default function GanttModal({ isOpen, onClose, enquiry, showSuccessToast }) {
   const [isEmailSectionOpen, setIsEmailSectionOpen] = useState(false);
   const [emailTo, setEmailTo] = useState('');
   const [emailSubject, setEmailSubject] = useState('');
@@ -118,6 +118,9 @@ export default function GanttModal({ isOpen, onClose, enquiry }) {
       }
 
       setSuccessMsg('Progress update email sent successfully!');
+      if (showSuccessToast) {
+        showSuccessToast('Progress update email sent successfully!');
+      }
       setEmailMessage('');
       setImages([]);
     } catch (err) {
