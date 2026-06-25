@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
+import { API_BASE } from './config';
 import './App.css';
-
-const API_BASE = 'http://localhost:5000/api';
 
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
