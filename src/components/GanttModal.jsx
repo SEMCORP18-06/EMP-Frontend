@@ -4,6 +4,7 @@ import { API_BASE } from '../config';
 export default function GanttModal({ isOpen, onClose, enquiry, showSuccessToast }) {
   const [isEmailSectionOpen, setIsEmailSectionOpen] = useState(false);
   const [emailTo, setEmailTo] = useState('');
+  const [emailCc, setEmailCc] = useState('');
   const [emailSubject, setEmailSubject] = useState('');
   const [emailMessage, setEmailMessage] = useState('');
   const [includeGanttChart, setIncludeGanttChart] = useState(true);
@@ -15,6 +16,7 @@ export default function GanttModal({ isOpen, onClose, enquiry, showSuccessToast 
   useEffect(() => {
     if (enquiry) {
       setEmailTo(enquiry.mailId || '');
+      setEmailCc('');
       setEmailSubject(`Project Progress Update: ${enquiry.companyName || '-'} (PO: ${enquiry.poNumber || '-'})`);
       setEmailMessage('');
       setImages([]);
@@ -105,6 +107,7 @@ export default function GanttModal({ isOpen, onClose, enquiry, showSuccessToast 
         },
         body: JSON.stringify({
           to: emailTo.trim(),
+          cc: emailCc.trim() || undefined,
           subject: emailSubject.trim(),
           message: emailMessage,
           includeGantt: includeGanttChart,
@@ -385,6 +388,19 @@ export default function GanttModal({ isOpen, onClose, enquiry, showSuccessToast 
                       required
                       className="form-control-input"
                     />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="emailCc">CC (Additional Recipients):</label>
+                    <input
+                      id="emailCc"
+                      type="text"
+                      value={emailCc}
+                      onChange={(e) => setEmailCc(e.target.value)}
+                      placeholder="e.g. john@example.com, jane@example.com"
+                      className="form-control-input"
+                    />
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', marginTop: '3px', display: 'block' }}>Separate multiple email addresses with commas</span>
                   </div>
 
                   <div className="form-group">

@@ -4,6 +4,7 @@ import { API_BASE } from '../config';
 
 export default function SendMailModal({ isOpen, onClose, enquiry, token, showSuccessToast }) {
   const [toEmail, setToEmail] = useState('');
+  const [ccEmails, setCcEmails] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [attachment, setAttachment] = useState(null);
@@ -18,6 +19,7 @@ export default function SendMailModal({ isOpen, onClose, enquiry, token, showSuc
   useEffect(() => {
     if (isOpen && enquiry) {
       setToEmail(enquiry.mailId || '');
+      setCcEmails('');
       const po = enquiry.poNumber || '';
       const poSuffix = po ? ` - PO: ${po}` : '';
       setSubject(`Project Confirmation${poSuffix}`);
@@ -108,6 +110,7 @@ export default function SendMailModal({ isOpen, onClose, enquiry, token, showSuc
         },
         body: JSON.stringify({
           to: toEmail.trim(),
+          cc: ccEmails.trim() || undefined,
           subject: subject.trim(),
           message: message.trim(),
           attachment: attachmentBase64
@@ -172,6 +175,32 @@ export default function SendMailModal({ isOpen, onClose, enquiry, token, showSuc
                   }}
                 />
               </div>
+            </div>
+
+            {/* CC Recipients Field */}
+            <div className="form-group" style={{ marginBottom: '20px' }}>
+              <label htmlFor="email-cc" style={{ fontWeight: '600', display: 'block', marginBottom: '6px', fontSize: '0.9rem', color: 'var(--text-primary)' }}>CC (Additional Recipients)</label>
+              <div style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
+                <span style={{ position: 'absolute', left: '14px', fontSize: '1.1rem', pointerEvents: 'none', color: 'var(--text-secondary)' }}>👥</span>
+                <input
+                  id="email-cc"
+                  type="text"
+                  className="form-control"
+                  placeholder="e.g. john@example.com, jane@example.com"
+                  value={ccEmails}
+                  onChange={(e) => setCcEmails(e.target.value)}
+                  disabled={loading}
+                  style={{
+                    borderRadius: '10px',
+                    padding: '10px 14px 10px 38px',
+                    border: '1px solid var(--border-color)',
+                    background: 'var(--bg-card)',
+                    fontSize: '0.92rem',
+                    transition: 'border-color 0.25s ease'
+                  }}
+                />
+              </div>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '4px', display: 'block' }}>Separate multiple email addresses with commas</span>
             </div>
 
             <div className="form-group" style={{ marginBottom: '20px' }}>
