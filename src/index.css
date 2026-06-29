@@ -3576,6 +3576,393 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(2, 132, 199, 0.005);
 }
 
+.checkbox-warning-hint {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-left: 24px;
+}
+
+.gantt-email-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.btn-send-update {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 0.92rem;
+}
+
+.loading-spinner-small {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Beautified SendMailModal CSS styling */
+.send-mail-modal-recipient-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(14, 165, 233, 0.03);
+  border: 1px solid rgba(14, 165, 233, 0.15);
+  border-left: 4px solid #0ea5e9;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+}
+
+.send-mail-modal-recipient-card-icon {
+  font-size: 1.4rem;
+  background: rgba(14, 165, 233, 0.1);
+  padding: 8px;
+  border-radius: 8px;
+  color: #0ea5e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.send-mail-modal-recipient-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.send-mail-modal-recipient-card-info strong {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.send-mail-modal-recipient-card-info span {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.send-mail-modal-dropzone {
+  border: 2px dashed rgba(14, 165, 233, 0.2);
+  border-radius: 12px;
+  padding: 24px 20px;
+  text-align: center;
+  background: rgba(14, 165, 233, 0.01);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.send-mail-modal-dropzone:hover, .send-mail-modal-dropzone.active {
+  border-color: #0ea5e9;
+  background: rgba(14, 165, 233, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.08);
+}
+
+.send-mail-modal-dropzone-icon {
+  font-size: 2.2rem;
+  display: inline-block;
+  margin-bottom: 8px;
+  transition: transform 0.2s ease;
+}
+
+.send-mail-modal-dropzone:hover .send-mail-modal-dropzone-icon {
+  transform: scale(1.15) rotate(-5deg);
+}
+
+.send-mail-modal-file-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 10px 14px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.send-mail-modal-file-card:hover {
+  border-color: rgba(14, 165, 233, 0.4);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.send-mail-modal-file-card-details {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.send-mail-modal-file-card-icon {
+  font-size: 1.6rem;
+  background: rgba(14, 165, 233, 0.08);
+  padding: 6px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.send-mail-modal-file-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.send-mail-modal-file-card-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.send-mail-modal-file-card-size {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.send-mail-modal-file-card-remove {
+  background: rgba(239, 68, 68, 0.06);
+  border: none;
+  color: #ef4444;
+  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.send-mail-modal-file-card-remove:hover {
+  background: #ef4444;
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+/* Light mode overrides for SendMailModal */
+[data-theme="light"] .send-mail-modal-recipient-card {
+  background: rgba(2, 132, 199, 0.02);
+  border: 1px solid rgba(2, 132, 199, 0.12);
+  border-left: 4px solid #0284c7;
+}
+
+[data-theme="light"] .send-mail-modal-recipient-card-icon {
+  background: rgba(2, 132, 199, 0.06);
+  color: #0284c7;
+}
+
+[data-theme="light"] .send-mail-modal-dropzone {
+  border-color: rgba(2, 132, 199, 0.18);
+  background: rgba(2, 132, 199, 0.005);
+}
+
+[data-theme="light"] .send-mail-modal-dropzone:hover, 
+[data-theme="light"] .send-mail-modal-dropzone.active {
+  border-color: #0284c7;
+  background: rgba(2, 132, 199, 0.03);
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.06);
+}
+
+.gantt-email-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.btn-send-update {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 0.92rem;
+}
+
+.loading-spinner-small {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 0.8s linear infinite;
+}
+
+/* Beautified SendMailModal CSS styling */
+.send-mail-modal-recipient-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(14, 165, 233, 0.03);
+  border: 1px solid rgba(14, 165, 233, 0.15);
+  border-left: 4px solid #0ea5e9;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+}
+
+.send-mail-modal-recipient-card-icon {
+  font-size: 1.4rem;
+  background: rgba(14, 165, 233, 0.1);
+  padding: 8px;
+  border-radius: 8px;
+  color: #0ea5e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.send-mail-modal-recipient-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.send-mail-modal-recipient-card-info strong {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.send-mail-modal-recipient-card-info span {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.send-mail-modal-dropzone {
+  border: 2px dashed rgba(14, 165, 233, 0.2);
+  border-radius: 12px;
+  padding: 24px 20px;
+  text-align: center;
+  background: rgba(14, 165, 233, 0.01);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.send-mail-modal-dropzone:hover, .send-mail-modal-dropzone.active {
+  border-color: #0ea5e9;
+  background: rgba(14, 165, 233, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.08);
+}
+
+.send-mail-modal-dropzone-icon {
+  font-size: 2.2rem;
+  display: inline-block;
+  margin-bottom: 8px;
+  transition: transform 0.2s ease;
+}
+
+.send-mail-modal-dropzone:hover .send-mail-modal-dropzone-icon {
+  transform: scale(1.15) rotate(-5deg);
+}
+
+.send-mail-modal-file-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 10px 14px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.send-mail-modal-file-card:hover {
+  border-color: rgba(14, 165, 233, 0.4);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.send-mail-modal-file-card-details {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.send-mail-modal-file-card-icon {
+  font-size: 1.6rem;
+  background: rgba(14, 165, 233, 0.08);
+  padding: 6px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.send-mail-modal-file-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.send-mail-modal-file-card-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.send-mail-modal-file-card-size {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.send-mail-modal-file-card-remove {
+  background: rgba(239, 68, 68, 0.06);
+  border: none;
+  color: #ef4444;
+  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.send-mail-modal-file-card-remove:hover {
+  background: #ef4444;
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+/* Light mode overrides for SendMailModal */
+[data-theme="light"] .send-mail-modal-recipient-card {
+  background: rgba(2, 132, 199, 0.02);
+  border: 1px solid rgba(2, 132, 199, 0.12);
+  border-left: 4px solid #0284c7;
+}
+
+[data-theme="light"] .send-mail-modal-recipient-card-icon {
+  background: rgba(2, 132, 199, 0.06);
+  color: #0284c7;
+}
+
+[data-theme="light"] .send-mail-modal-dropzone {
+  border-color: rgba(2, 132, 199, 0.18);
+  background: rgba(2, 132, 199, 0.005);
+}
+
 [data-theme="light"] .send-mail-modal-dropzone:hover, 
 [data-theme="light"] .send-mail-modal-dropzone.active {
   border-color: #0284c7;
@@ -3589,4 +3976,22 @@ h1, h2, h3, h4, h5, h6 {
 
 [data-theme="light"] .send-mail-modal-file-card-icon {
   background: rgba(2, 132, 199, 0.05);
+}
+
+/* Dashboard Footer */
+.dashboard-footer {
+  text-align: center;
+  padding: 20px 24px;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border-color);
+  margin-top: auto;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  background: rgba(11, 15, 25, 0.4);
+}
+
+[data-theme="light"] .dashboard-footer {
+  background: rgba(255, 255, 255, 0.5);
+  color: #64748b;
 }

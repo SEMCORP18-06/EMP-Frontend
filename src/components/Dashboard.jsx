@@ -1034,8 +1034,11 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
             </div>
           </div>
         )}
-
       </main>
+
+      <footer className="dashboard-footer">
+        &copy; {new Date().getFullYear()} SEMCO Groups. All rights reserved. | Enquiry Management Portal
+      </footer>
 
       {/* Add / Edit Modal */}
       <EnquiryModal 
