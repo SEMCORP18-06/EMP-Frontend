@@ -615,16 +615,14 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
                                   >
                                     ➕
                                   </button>
-                                  {isSystemAdmin && (
-                                    <button
-                                      type="button"
-                                      className="action-btn delete"
-                                      onClick={() => handleRemoveRow(idx)}
-                                      title="Delete"
-                                    >
-                                      🗑️
-                                    </button>
-                                  )}
+                                  <button
+                                    type="button"
+                                    className="action-btn delete"
+                                    onClick={() => handleRemoveRow(idx)}
+                                    title="Delete"
+                                  >
+                                    🗑️
+                                  </button>
                               </div>
                             </td>
                           </>

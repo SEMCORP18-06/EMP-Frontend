@@ -188,27 +188,27 @@ export default function ManageEquipmentsModal({ isOpen, onClose, token, isAdmin,
             )}
           </div>
 
-          {isAdmin ? (
-            <form onSubmit={handleAdd} style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
-              <input 
-                type="text"
-                className="form-input"
-                placeholder="Enter new equipment name..."
-                value={newEquipName}
-                onChange={(e) => setNewEquipName(e.target.value)}
-                style={{ flex: 1, margin: 0 }}
-                disabled={loading}
-              />
-              <button 
-                type="submit" 
-                className="btn btn-primary"
-                style={{ padding: '0 16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                disabled={loading}
-              >
-                {loading ? 'Adding...' : 'Add'}
-              </button>
-            </form>
-          ) : (
+          <form onSubmit={handleAdd} style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
+            <input 
+              type="text"
+              className="form-input"
+              placeholder="Enter new equipment name..."
+              value={newEquipName}
+              onChange={(e) => setNewEquipName(e.target.value)}
+              style={{ flex: 1, margin: 0 }}
+              disabled={loading}
+            />
+            <button 
+              type="submit" 
+              className="btn btn-primary"
+              style={{ padding: '0 16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              disabled={loading}
+            >
+              {loading ? 'Adding...' : 'Add'}
+            </button>
+          </form>
+
+          {!isAdmin && (
             <div style={{
               padding: '12px',
               background: 'rgba(99, 102, 241, 0.08)',
@@ -216,9 +216,10 @@ export default function ManageEquipmentsModal({ isOpen, onClose, token, isAdmin,
               borderRadius: '8px',
               color: 'var(--text-secondary)',
               fontSize: '0.9rem',
-              textAlign: 'center'
+              textAlign: 'center',
+              marginTop: '4px'
             }}>
-              ℹ️ Only administrators can add or delete equipments.
+              ℹ️ Only administrators can delete equipments.
             </div>
           )}
 
