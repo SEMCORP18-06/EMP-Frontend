@@ -46,6 +46,15 @@ export default function Login({ onLoginSuccess, isDark, onToggleTheme }) {
   const [verificationRequired, setVerificationRequired] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState('');
 
+  // Forgot password flow state hooks
+  const [forgotPasswordMode, setForgotPasswordMode] = useState(false);
+  const [forgotPasswordStep, setForgotPasswordStep] = useState('email'); // 'email' or 'reset'
+  const [resetOtpInput, setResetOtpInput] = useState('');
+  const [resetNewPassword, setResetNewPassword] = useState('');
+  const [resetConfirmPassword, setResetConfirmPassword] = useState('');
+  const [showResetNewPassword, setShowResetNewPassword] = useState(false);
+  const [showResetConfirmPassword, setShowResetConfirmPassword] = useState(false);
+
   // Success toast popup state
   const [successToast, setSuccessToast] = useState({ visible: false, message: '' });
 
@@ -191,6 +200,106 @@ export default function Login({ onLoginSuccess, isDark, onToggleTheme }) {
     }
   };
 
+  const handleForgotPasswordSubmit = async (e) => {
+    if (e) e.preventDefault();
+    if (!username.trim()) {
+      setError('Email address is required.');
+      return;
+    }
+    if (!username.toLowerCase().endsWith('@semcogroups.com')) {
+      setError('Domain Name incorrect');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    setSuccessMsg('');
+
+    try {
+      const response = await fetch(`${API_BASE}/auth/forgot-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username: username.trim() })
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to send OTP.');
+      }
+
+      showSuccessToast('Verification OTP sent to your email.');
+      setSuccessMsg('Verification OTP sent to your email.');
+      setForgotPasswordStep('reset');
+    } catch (err) {
+      setError(err.message || 'Failed to send OTP.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPasswordSubmit = async (e) => {
+    e.preventDefault();
+    if (!resetOtpInput.trim()) {
+      setError('OTP is required.');
+      return;
+    }
+    if (!resetNewPassword.trim()) {
+      setError('New Password is required.');
+      return;
+    }
+    if (resetNewPassword !== resetConfirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
+    // Password complexity check
+    const complexityError = validatePasswordComplexity(resetNewPassword);
+    if (complexityError) {
+      setError(complexityError);
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    setSuccessMsg('');
+
+    try {
+      const response = await fetch(`${API_BASE}/auth/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: username.trim(),
+          otp: resetOtpInput.trim(),
+          newPassword: resetNewPassword.trim()
+        })
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to reset password.');
+      }
+
+      showSuccessToast('Password reset successful! You can now log in.');
+      setSuccessMsg('Password reset successful! You can now log in.');
+      // Clear states
+      setForgotPasswordMode(false);
+      setForgotPasswordStep('email');
+      setResetOtpInput('');
+      setResetNewPassword('');
+      setResetConfirmPassword('');
+      setPassword('');
+      setConfirmPassword('');
+    } catch (err) {
+      setError(err.message || 'Failed to reset password.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (verificationRequired) {
     return (
       <div className="login-container">
@@ -302,381 +411,642 @@ export default function Login({ onLoginSuccess, isDark, onToggleTheme }) {
           </div>
         </div>
 
-        {/* Sign In / Sign Up Tab Headers */}
-        <div className="login-tabs" style={{ display: 'flex', borderBottom: '1px solid var(--border-color)', marginBottom: '24px' }}>
-          <button
-            type="button"
-            onClick={() => setActiveTab('login')}
-            style={{
-              flex: 1,
-              background: 'none',
-              border: 'none',
-              padding: '12px',
-              fontSize: '1.05rem',
-              fontWeight: '700',
-              cursor: 'pointer',
-              color: activeTab === 'login' ? '#e28743' : 'var(--text-secondary)',
-              borderBottom: activeTab === 'login' ? '2px solid #e28743' : '2px solid transparent',
-              transition: 'all 0.2s ease',
-              textAlign: 'center'
-            }}
-          >
-            Sign In
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('signup')}
-            style={{
-              flex: 1,
-              background: 'none',
-              border: 'none',
-              padding: '12px',
-              fontSize: '1.05rem',
-              fontWeight: '700',
-              cursor: 'pointer',
-              color: activeTab === 'signup' ? '#e28743' : 'var(--text-secondary)',
-              borderBottom: activeTab === 'signup' ? '2px solid #e28743' : '2px solid transparent',
-              transition: 'all 0.2s ease',
-              textAlign: 'center'
-            }}
-          >
-            Sign Up
-          </button>
-        </div>
+        {forgotPasswordMode ? (
+          <div>
+            <h3 style={{ color: 'var(--text-primary)', fontSize: '1.25rem', fontWeight: '700', marginBottom: '8px', textAlign: 'center' }}>
+              {forgotPasswordStep === 'email' ? 'Forgot Password' : 'Verify OTP'}
+            </h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.5', marginBottom: '24px', textAlign: 'center' }}>
+              {forgotPasswordStep === 'email' 
+                ? 'Enter your registered email address to receive a 6-digit OTP.' 
+                : `We sent a 6-digit OTP to your email (${username}).`}
+            </p>
 
-        {error && (
-          <div className="error-banner" style={{ marginBottom: '16px' }}>
-            <span>⚠️</span>
-            <span>{error}</span>
-          </div>
-        )}
+            {error && (
+              <div className="error-banner" style={{ marginBottom: '16px' }}>
+                <span>⚠️</span>
+                <span>{error}</span>
+              </div>
+            )}
 
-        {successMsg && (
-          <div className="error-banner" style={{ background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.3)', color: '#34d399', marginBottom: '16px' }}>
-            <span>✅</span>
-            <span>{successMsg}</span>
-          </div>
-        )}
+            {successMsg && (
+              <div className="error-banner" style={{ background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.3)', color: '#34d399', marginBottom: '16px' }}>
+                <span>✅</span>
+                <span>{successMsg}</span>
+              </div>
+            )}
 
-        <form onSubmit={handleSubmit}>
-          {/* Name Field (Sign Up Only) */}
-          {activeTab === 'signup' && (
-            <div className="form-group" style={{ marginBottom: '20px' }}>
-              <label className="form-label" htmlFor="name" style={{ fontSize: '0.82rem', fontWeight: '800', letterSpacing: '0.05em', color: 'var(--text-secondary)', marginBottom: '8px', display: 'block' }}>
-                NAME
-              </label>
-              <input
-                className="form-input"
-                type="text"
-                id="name"
-                placeholder="Enter your name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                style={{ width: '100%', height: '48px', padding: '12px 16px', borderRadius: '10px' }}
-              />
-            </div>
-          )}
+            {forgotPasswordStep === 'email' ? (
+              <form onSubmit={handleForgotPasswordSubmit}>
+                <div className="form-group" style={{ marginBottom: '24px' }}>
+                  <label className="form-label" htmlFor="reset-email" style={{ fontSize: '0.82rem', fontWeight: '800', letterSpacing: '0.05em', color: 'var(--text-secondary)', marginBottom: '8px', display: 'block' }}>
+                    EMAIL ADDRESS
+                  </label>
+                  <input
+                    className="form-input"
+                    type="email"
+                    id="reset-email"
+                    placeholder="name@semcogroups.com"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                    style={{ width: '100%', height: '48px', padding: '12px 16px', borderRadius: '10px' }}
+                  />
+                </div>
 
-          {/* Email Address / Username Field */}
-          <div className="form-group" style={{ marginBottom: '20px' }}>
-            <label className="form-label" htmlFor="username" style={{ fontSize: '0.82rem', fontWeight: '800', letterSpacing: '0.05em', color: 'var(--text-secondary)', marginBottom: '8px', display: 'block' }}>
-              EMAIL ADDRESS
-            </label>
-            <input
-              className="form-input"
-              type="text"
-              id="username"
-              placeholder="name@semcogroups.com"
-              value={username}
-              onChange={(e) => {
-                const val = e.target.value;
-                setUsername(val);
-                if (activeTab === 'signup') {
-                  if (val.toLowerCase().endsWith('@semcogroups.com')) {
-                    setError('');
-                  } else if (val.includes('@') && !val.toLowerCase().endsWith('@semcogroups.com') && val.split('@')[1].includes('.')) {
-                    setError('Domain Name incorrect');
-                  }
-                }
-              }}
-              onBlur={() => {
-                if (activeTab === 'signup' && username) {
-                  if (!username.toLowerCase().endsWith('@semcogroups.com')) {
-                    setError('Domain Name incorrect');
-                  } else {
-                    setError('');
-                  }
-                }
-              }}
-              required
-              style={{ width: '100%', height: '48px', padding: '12px 16px', borderRadius: '10px' }}
-            />
-          </div>
+                <button
+                  type="submit"
+                  className="login-btn"
+                  disabled={loading}
+                  style={{
+                    width: '100%',
+                    height: '48px',
+                    borderRadius: '10px',
+                    background: 'linear-gradient(90deg, #e28743 0%, #5c6bc0 100%)',
+                    border: 'none',
+                    color: '#ffffff',
+                    fontSize: '1rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(226, 135, 67, 0.25)',
+                    transition: 'all 0.2s ease',
+                    marginBottom: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  Send OTP
+                </button>
 
-          {/* Password Field */}
-          <div className="form-group" style={{ marginBottom: '20px' }}>
-            <label className="form-label" htmlFor="password" style={{ fontSize: '0.82rem', fontWeight: '800', letterSpacing: '0.05em', color: 'var(--text-secondary)', marginBottom: '8px', display: 'block' }}>
-              PASSWORD
-            </label>
-            <div style={{ position: 'relative' }}>
-              <input
-                className="form-input"
-                type={showPassword ? 'text' : 'password'}
-                id="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setPassword(val);
-                  if (activeTab === 'signup') {
-                    if (val === '') {
+                <div style={{ textAlign: 'center' }}>
+                  <span
+                    onClick={() => {
+                      setForgotPasswordMode(false);
                       setError('');
-                    } else {
-                      setError(validatePasswordComplexity(val));
-                    }
-                  }
-                }}
-                onBlur={() => {
-                  if (activeTab === 'signup' && password) {
-                    setError(validatePasswordComplexity(password));
-                  }
-                }}
-                required
-                style={{ width: '100%', height: '48px', padding: '12px 45px 12px 16px', borderRadius: '10px' }}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(prev => !prev)}
-                style={{
-                  position: 'absolute',
-                  right: '16px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  color: 'var(--text-secondary)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  padding: 0
-                }}
-                title={showPassword ? 'Hide Password' : 'Show Password'}
-              >
-                {showPassword ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                    <line x1="1" y1="1" x2="23" y2="23"></line>
-                  </svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                  </svg>
-                )}
-              </button>
-            </div>
-            {activeTab === 'signup' && (
-              <small style={{ color: 'var(--text-secondary)', fontSize: '0.74rem', marginTop: '4px', display: 'block', lineHeight: '1.3' }}>
-                Password requires min. 7 characters and 1 special character.
-              </small>
+                      setSuccessMsg('');
+                    }}
+                    style={{ fontSize: '0.9rem', color: 'var(--accent-primary)', fontWeight: '600', cursor: 'pointer' }}
+                  >
+                    Back to Sign In
+                  </span>
+                </div>
+              </form>
+            ) : (
+              <form onSubmit={handleResetPasswordSubmit}>
+                <div className="form-group" style={{ marginBottom: '20px' }}>
+                  <label className="form-label" htmlFor="reset-otp" style={{ fontSize: '0.82rem', fontWeight: '800', letterSpacing: '0.05em', color: 'var(--text-secondary)', marginBottom: '8px', display: 'block' }}>
+                    ENTER 6-DIGIT OTP
+                  </label>
+                  <input
+                    className="form-input"
+                    type="text"
+                    id="reset-otp"
+                    placeholder="123456"
+                    maxLength="6"
+                    value={resetOtpInput}
+                    onChange={(e) => setResetOtpInput(e.target.value.replace(/\D/g, ''))}
+                    required
+                    style={{ width: '100%', height: '48px', padding: '12px 16px', borderRadius: '10px', letterSpacing: '2px', fontWeight: 'bold' }}
+                  />
+                  <small style={{ color: 'var(--text-secondary)', fontSize: '0.74rem', marginTop: '4px', display: 'block' }}>
+                    Valid for 2 minutes only.
+                  </small>
+                </div>
+
+                <div className="form-group" style={{ marginBottom: '20px' }}>
+                  <label className="form-label" htmlFor="reset-new-password" style={{ fontSize: '0.82rem', fontWeight: '800', letterSpacing: '0.05em', color: 'var(--text-secondary)', marginBottom: '8px', display: 'block' }}>
+                    NEW PASSWORD
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      className="form-input"
+                      type={showResetNewPassword ? 'text' : 'password'}
+                      id="reset-new-password"
+                      placeholder="••••••••"
+                      value={resetNewPassword}
+                      onChange={(e) => {
+                        setResetNewPassword(e.target.value);
+                        setError(validatePasswordComplexity(e.target.value));
+                      }}
+                      required
+                      style={{ width: '100%', height: '48px', padding: '12px 45px 12px 16px', borderRadius: '10px' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowResetNewPassword(prev => !prev)}
+                      style={{
+                        position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)',
+                        background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0
+                      }}
+                      title={showResetNewPassword ? 'Hide Password' : 'Show Password'}
+                    >
+                      {showResetNewPassword ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                          <line x1="1" y1="1" x2="23" y2="23"></line>
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                  <small style={{ color: 'var(--text-secondary)', fontSize: '0.74rem', marginTop: '4px', display: 'block', lineHeight: '1.3' }}>
+                    Password requires min. 7 characters and 1 special character.
+                  </small>
+                </div>
+
+                <div className="form-group" style={{ marginBottom: '24px' }}>
+                  <label className="form-label" htmlFor="reset-confirm-password" style={{ fontSize: '0.82rem', fontWeight: '800', letterSpacing: '0.05em', color: 'var(--text-secondary)', marginBottom: '8px', display: 'block' }}>
+                    CONFIRM NEW PASSWORD
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      className="form-input"
+                      type={showResetConfirmPassword ? 'text' : 'password'}
+                      id="reset-confirm-password"
+                      placeholder="••••••••"
+                      value={resetConfirmPassword}
+                      onChange={(e) => {
+                        setResetConfirmPassword(e.target.value);
+                        if (resetNewPassword !== e.target.value) {
+                          setError('Passwords do not match.');
+                        } else {
+                          setError('');
+                        }
+                      }}
+                      required
+                      style={{ width: '100%', height: '48px', padding: '12px 45px 12px 16px', borderRadius: '10px' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowResetConfirmPassword(prev => !prev)}
+                      style={{
+                        position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)',
+                        background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0
+                      }}
+                      title={showResetConfirmPassword ? 'Hide Password' : 'Show Password'}
+                    >
+                      {showResetConfirmPassword ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                          <line x1="1" y1="1" x2="23" y2="23"></line>
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="login-btn"
+                  disabled={loading}
+                  style={{
+                    width: '100%',
+                    height: '48px',
+                    borderRadius: '10px',
+                    background: 'linear-gradient(90deg, #e28743 0%, #5c6bc0 100%)',
+                    border: 'none',
+                    color: '#ffffff',
+                    fontSize: '1rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 12px rgba(226, 135, 67, 0.25)',
+                    transition: 'all 0.2s ease',
+                    marginBottom: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  Reset Password
+                </button>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px' }}>
+                  <span
+                    onClick={handleForgotPasswordSubmit}
+                    style={{ fontSize: '0.85rem', color: 'var(--accent-primary)', fontWeight: '600', cursor: 'pointer' }}
+                  >
+                    Resend OTP
+                  </span>
+                  <span
+                    onClick={() => {
+                      setForgotPasswordMode(false);
+                      setError('');
+                      setSuccessMsg('');
+                    }}
+                    style={{ fontSize: '0.85rem', color: 'var(--accent-primary)', fontWeight: '600', cursor: 'pointer' }}
+                  >
+                    Back to Sign In
+                  </span>
+                </div>
+              </form>
             )}
           </div>
+        ) : (
+          <>
+            {/* Sign In / Sign Up Tab Headers */}
+            <div className="login-tabs" style={{ display: 'flex', borderBottom: '1px solid var(--border-color)', marginBottom: '24px' }}>
+              <button
+                type="button"
+                onClick={() => setActiveTab('login')}
+                style={{
+                  flex: 1,
+                  background: 'none',
+                  border: 'none',
+                  padding: '12px',
+                  fontSize: '1.05rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  color: activeTab === 'login' ? '#e28743' : 'var(--text-secondary)',
+                  borderBottom: activeTab === 'login' ? '2px solid #e28743' : '2px solid transparent',
+                  transition: 'all 0.2s ease',
+                  textAlign: 'center'
+                }}
+              >
+                Sign In
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('signup')}
+                style={{
+                  flex: 1,
+                  background: 'none',
+                  border: 'none',
+                  padding: '12px',
+                  fontSize: '1.05rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  color: activeTab === 'signup' ? '#e28743' : 'var(--text-secondary)',
+                  borderBottom: activeTab === 'signup' ? '2px solid #e28743' : '2px solid transparent',
+                  transition: 'all 0.2s ease',
+                  textAlign: 'center'
+                }}
+              >
+                Sign Up
+              </button>
+            </div>
 
-          {/* Confirm Password Field (Sign Up Only) */}
-          {activeTab === 'signup' && (
-            <div className="form-group" style={{ marginBottom: '20px' }}>
-              <label className="form-label" htmlFor="confirmPassword" style={{ fontSize: '0.82rem', fontWeight: '800', letterSpacing: '0.05em', color: 'var(--text-secondary)', marginBottom: '8px', display: 'block' }}>
-                CONFIRM PASSWORD
-              </label>
-              <div style={{ position: 'relative' }}>
+            {error && (
+              <div className="error-banner" style={{ marginBottom: '16px' }}>
+                <span>⚠️</span>
+                <span>{error}</span>
+              </div>
+            )}
+
+            {successMsg && (
+              <div className="error-banner" style={{ background: 'rgba(16, 185, 129, 0.12)', border: '1px solid rgba(16, 185, 129, 0.3)', color: '#34d399', marginBottom: '16px' }}>
+                <span>✅</span>
+                <span>{successMsg}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit}>
+              {/* Name Field (Sign Up Only) */}
+              {activeTab === 'signup' && (
+                <div className="form-group" style={{ marginBottom: '20px' }}>
+                  <label className="form-label" htmlFor="name" style={{ fontSize: '0.82rem', fontWeight: '800', letterSpacing: '0.05em', color: 'var(--text-secondary)', marginBottom: '8px', display: 'block' }}>
+                    NAME
+                  </label>
+                  <input
+                    className="form-input"
+                    type="text"
+                    id="name"
+                    placeholder="Enter your name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    style={{ width: '100%', height: '48px', padding: '12px 16px', borderRadius: '10px' }}
+                  />
+                </div>
+              )}
+
+              {/* Email Address / Username Field */}
+              <div className="form-group" style={{ marginBottom: '20px' }}>
+                <label className="form-label" htmlFor="username" style={{ fontSize: '0.82rem', fontWeight: '800', letterSpacing: '0.05em', color: 'var(--text-secondary)', marginBottom: '8px', display: 'block' }}>
+                  EMAIL ADDRESS
+                </label>
                 <input
                   className="form-input"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  id="confirmPassword"
-                  placeholder="••••••••"
-                  value={confirmPassword}
+                  type="text"
+                  id="username"
+                  placeholder="name@semcogroups.com"
+                  value={username}
                   onChange={(e) => {
                     const val = e.target.value;
-                    setConfirmPassword(val);
+                    setUsername(val);
                     if (activeTab === 'signup') {
-                      if (val === '') {
+                      if (val.toLowerCase().endsWith('@semcogroups.com')) {
                         setError('');
-                      } else if (password !== val) {
-                        setError("Passwords do not match. Please re-enter them correctly.");
-                      } else {
-                        setError('');
+                      } else if (val.includes('@') && !val.toLowerCase().endsWith('@semcogroups.com') && val.split('@')[1].includes('.')) {
+                        setError('Domain Name incorrect');
                       }
                     }
                   }}
                   onBlur={() => {
-                    if (activeTab === 'signup' && confirmPassword) {
-                      if (password !== confirmPassword) {
-                        setError("Passwords do not match. Please re-enter them correctly.");
+                    if (activeTab === 'signup' && username) {
+                      if (!username.toLowerCase().endsWith('@semcogroups.com')) {
+                        setError('Domain Name incorrect');
                       } else {
                         setError('');
                       }
                     }
                   }}
                   required
-                  style={{ width: '100%', height: '48px', padding: '12px 45px 12px 16px', borderRadius: '10px' }}
+                  style={{ width: '100%', height: '48px', padding: '12px 16px', borderRadius: '10px' }}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(prev => !prev)}
-                  style={{
-                    position: 'absolute',
-                    right: '16px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'none',
-                    border: 'none',
-                    color: 'var(--text-secondary)',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: 0
-                  }}
-                  title={showConfirmPassword ? 'Hide Password' : 'Show Password'}
-                >
-                  {showConfirmPassword ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                      <line x1="1" y1="1" x2="23" y2="23"></line>
-                    </svg>
-                  ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                      <circle cx="12" cy="12" r="3"></circle>
-                    </svg>
-                  )}
-                </button>
               </div>
-            </div>
-          )}
 
-          {/* Captcha Section (Sign Up Only) */}
-          {activeTab === 'signup' && (
-            <div className="form-group" style={{ marginBottom: '24px' }}>
-              <label className="form-label" style={{ fontSize: '0.82rem', fontWeight: '800', letterSpacing: '0.05em', color: 'var(--text-secondary)', marginBottom: '8px', display: 'block' }}>
-                CAPTCHA CODE
-              </label>
-              
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '12px' }}>
-                <div 
-                  style={{ 
-                    background: 'linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%)', 
-                    color: '#0f172a', 
-                    padding: '8px 20px', 
-                    borderRadius: '8px', 
-                    fontSize: '1.2rem', 
-                    fontWeight: '800', 
-                    letterSpacing: '4px', 
-                    fontStyle: 'italic',
-                    userSelect: 'none',
-                    textDecoration: 'line-through',
-                    boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    border: '1px solid rgba(0,0,0,0.15)',
-                    height: '40px'
-                  }}
-                >
-                  {generatedCaptcha}
+              {/* Password Field */}
+              <div className="form-group" style={{ marginBottom: '20px' }}>
+                <label className="form-label" htmlFor="password" style={{ fontSize: '0.82rem', fontWeight: '800', letterSpacing: '0.05em', color: 'var(--text-secondary)', marginBottom: '8px', display: 'block' }}>
+                  PASSWORD
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    className="form-input"
+                    type={showPassword ? 'text' : 'password'}
+                    id="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setPassword(val);
+                      if (activeTab === 'signup') {
+                        if (val === '') {
+                          setError('');
+                        } else {
+                          setError(validatePasswordComplexity(val));
+                        }
+                      }
+                    }}
+                    onBlur={() => {
+                      if (activeTab === 'signup' && password) {
+                        setError(validatePasswordComplexity(password));
+                      }
+                    }}
+                    required
+                    style={{ width: '100%', height: '48px', padding: '12px 45px 12px 16px', borderRadius: '10px' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(prev => !prev)}
+                    style={{
+                      position: 'absolute',
+                      right: '16px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--text-secondary)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: 0
+                    }}
+                    title={showPassword ? 'Hide Password' : 'Show Password'}
+                  >
+                    {showPassword ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                      </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                    )}
+                  </button>
                 </div>
-                <button 
-                  type="button" 
-                  onClick={() => setGeneratedCaptcha(generateRandomCaptcha())} 
-                  style={{ 
-                    background: 'none', 
-                    border: 'none', 
-                    fontSize: '1.25rem', 
-                    cursor: 'pointer', 
-                    padding: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                  title="Refresh Captcha"
-                >
-                  🔄
-                </button>
+                {activeTab === 'signup' && (
+                  <small style={{ color: 'var(--text-secondary)', fontSize: '0.74rem', marginTop: '4px', display: 'block', lineHeight: '1.3' }}>
+                    Password requires min. 7 characters and 1 special character.
+                  </small>
+                )}
+                {activeTab === 'login' && (
+                  <div style={{ textAlign: 'right', marginTop: '8px' }}>
+                    <span
+                      onClick={() => {
+                        setForgotPasswordMode(true);
+                        setForgotPasswordStep('email');
+                        setError('');
+                        setSuccessMsg('');
+                      }}
+                      style={{ fontSize: '0.82rem', color: 'var(--accent-primary)', fontWeight: '600', cursor: 'pointer' }}
+                    >
+                      Forgot Password?
+                    </span>
+                  </div>
+                )}
               </div>
-              
-              <input
-                className="form-input"
-                type="text"
-                placeholder="Enter Captcha Code"
-                value={captchaInput}
-                onChange={(e) => setCaptchaInput(e.target.value)}
-                required
-                style={{ width: '100%', height: '48px', padding: '12px 16px', borderRadius: '10px' }}
-              />
+
+              {/* Confirm Password Field (Sign Up Only) */}
+              {activeTab === 'signup' && (
+                <div className="form-group" style={{ marginBottom: '20px' }}>
+                  <label className="form-label" htmlFor="confirmPassword" style={{ fontSize: '0.82rem', fontWeight: '800', letterSpacing: '0.05em', color: 'var(--text-secondary)', marginBottom: '8px', display: 'block' }}>
+                    CONFIRM PASSWORD
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      className="form-input"
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      id="confirmPassword"
+                      placeholder="••••••••"
+                      value={confirmPassword}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setConfirmPassword(val);
+                        if (activeTab === 'signup') {
+                          if (val === '') {
+                            setError('');
+                          } else if (password !== val) {
+                            setError("Passwords do not match. Please re-enter them correctly.");
+                          } else {
+                            setError('');
+                          }
+                        }
+                      }}
+                      onBlur={() => {
+                        if (activeTab === 'signup' && confirmPassword) {
+                          if (password !== confirmPassword) {
+                            setError("Passwords do not match. Please re-enter them correctly.");
+                          } else {
+                            setError('');
+                          }
+                        }
+                      }}
+                      required
+                      style={{ width: '100%', height: '48px', padding: '12px 45px 12px 16px', borderRadius: '10px' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(prev => !prev)}
+                      style={{
+                        position: 'absolute',
+                        right: '16px',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--text-secondary)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: 0
+                      }}
+                      title={showConfirmPassword ? 'Hide Password' : 'Show Password'}
+                    >
+                      {showConfirmPassword ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                          <line x1="1" y1="1" x2="23" y2="23"></line>
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Captcha Section (Sign Up Only) */}
+              {activeTab === 'signup' && (
+                <div className="form-group" style={{ marginBottom: '24px' }}>
+                  <label className="form-label" style={{ fontSize: '0.82rem', fontWeight: '800', letterSpacing: '0.05em', color: 'var(--text-secondary)', marginBottom: '8px', display: 'block' }}>
+                    CAPTCHA CODE
+                  </label>
+                  
+                  <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '12px' }}>
+                    <div 
+                      style={{ 
+                        background: 'linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%)', 
+                        color: '#0f172a', 
+                        padding: '8px 20px', 
+                        borderRadius: '8px', 
+                        fontSize: '1.2rem', 
+                        fontWeight: '800', 
+                        letterSpacing: '4px', 
+                        fontStyle: 'italic',
+                        userSelect: 'none',
+                        textDecoration: 'line-through',
+                        boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: '1px solid rgba(0,0,0,0.15)',
+                        height: '40px'
+                      }}
+                    >
+                      {generatedCaptcha}
+                    </div>
+                    <button 
+                      type="button" 
+                      onClick={() => setGeneratedCaptcha(generateRandomCaptcha())} 
+                      style={{ 
+                        background: 'none', 
+                        border: 'none', 
+                        fontSize: '1.25rem', 
+                        cursor: 'pointer', 
+                        padding: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
+                      title="Refresh Captcha"
+                    >
+                      🔄
+                    </button>
+                  </div>
+                  
+                  <input
+                    className="form-input"
+                    type="text"
+                    placeholder="Enter Captcha Code"
+                    value={captchaInput}
+                    onChange={(e) => setCaptchaInput(e.target.value)}
+                    required
+                    style={{ width: '100%', height: '48px', padding: '12px 16px', borderRadius: '10px' }}
+                  />
+                </div>
+              )}
+
+              {/* Gradient Submit Button */}
+              <button
+                className="login-btn"
+                type="submit"
+                style={{
+                  width: '100%',
+                  height: '48px',
+                  background: 'linear-gradient(90deg, #e28743 0%, #5c6bc0 100%)',
+                  border: 'none',
+                  borderRadius: '10px',
+                  color: '#ffffff',
+                  fontSize: '1rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 12px rgba(226, 135, 67, 0.25)',
+                  transition: 'all 0.2s ease-in-out',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.opacity = '0.9';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(226, 135, 67, 0.35)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.opacity = '1';
+                  e.currentTarget.style.transform = 'none';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(226, 135, 67, 0.25)';
+                }}
+              >
+                {activeTab === 'login' ? 'Sign In' : 'Sign Up'}
+              </button>
+            </form>
+
+            {/* Footer Link Toggle */}
+            <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+              {activeTab === 'login' ? (
+                <>
+                  Don't have an account?{' '}
+                  <span
+                    onClick={() => setActiveTab('signup')}
+                    style={{ color: 'var(--accent-primary)', fontWeight: '600', cursor: 'pointer' }}
+                  >
+                    Sign Up
+                  </span>
+                </>
+              ) : (
+                <>
+                  Already have an account?{' '}
+                  <span
+                    onClick={() => setActiveTab('login')}
+                    style={{ color: 'var(--accent-primary)', fontWeight: '600', cursor: 'pointer' }}
+                  >
+                    Sign In
+                  </span>
+                </>
+              )}
             </div>
-          )}
-
-          {/* Gradient Submit Button */}
-          <button
-            className="login-btn"
-            type="submit"
-            style={{
-              width: '100%',
-              height: '48px',
-              background: 'linear-gradient(90deg, #e28743 0%, #5c6bc0 100%)',
-              border: 'none',
-              borderRadius: '10px',
-              color: '#ffffff',
-              fontSize: '1rem',
-              fontWeight: '700',
-              cursor: 'pointer',
-              boxShadow: '0 4px 12px rgba(226, 135, 67, 0.25)',
-              transition: 'all 0.2s ease-in-out',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.opacity = '0.9';
-              e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = '0 6px 16px rgba(226, 135, 67, 0.35)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.opacity = '1';
-              e.currentTarget.style.transform = 'none';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(226, 135, 67, 0.25)';
-            }}
-          >
-            {activeTab === 'login' ? 'Sign In' : 'Sign Up'}
-          </button>
-        </form>
-
-        {/* Footer Link Toggle */}
-        <div style={{ textAlign: 'center', marginTop: '24px', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-          {activeTab === 'login' ? (
-            <>
-              Don't have an account?{' '}
-              <span
-                onClick={() => setActiveTab('signup')}
-                style={{ color: 'var(--accent-primary)', fontWeight: '600', cursor: 'pointer' }}
-              >
-                Sign Up
-              </span>
-            </>
-          ) : (
-            <>
-              Already have an account?{' '}
-              <span
-                onClick={() => setActiveTab('login')}
-                style={{ color: 'var(--accent-primary)', fontWeight: '600', cursor: 'pointer' }}
-              >
-                Sign In
-              </span>
-            </>
-          )}
-        </div>
+          </>
+        )}
       </div>
       {successToast.visible && (
         <div className="toast-success-banner">
