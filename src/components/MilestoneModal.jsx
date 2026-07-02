@@ -73,7 +73,6 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
   const [fprSearchQuery, setFprSearchQuery] = useState('');
   const [isConfirmClientOpen, setIsConfirmClientOpen] = useState(false);
   const [pendingMilestones, setPendingMilestones] = useState(null);
-  const [isConfirmFprOpen, setIsConfirmFprOpen] = useState(false);
   const [sendClientMailFlag, setSendClientMailFlag] = useState(false);
 
   const filteredFprs = fprs.filter(fpr => 
@@ -213,6 +212,9 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
 
   const hasNewlyAllottedMilestones = (milestones) => {
     const originalMilestones = enquiry?.milestones || [];
+    if (milestones.length !== originalMilestones.length) {
+      return true;
+    }
     for (let i = 0; i < milestones.length; i++) {
       const sub = milestones[i];
       if (!sub.fpr || !sub.fpr.trim()) {
@@ -230,7 +232,12 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
           const nameChanged = (orig.name || '').trim() !== (sub.name || '').trim();
           const startChanged = (orig.startDate || '') !== (sub.startDate || '');
           const endChanged = (orig.endDate || '') !== (sub.endDate || '');
-          if (nameChanged || startChanged || endChanged) {
+          const statusChanged = (orig.status || '') !== (sub.status || '');
+          const remarkChanged = (orig.remark || '').trim() !== (sub.remark || '').trim();
+          const actualEndChanged = (orig.actualEndDate || '') !== (sub.actualEndDate || '');
+          const percentageChanged = (Number(orig.percentage) || 0) !== (Number(sub.percentage) || 0);
+
+          if (nameChanged || startChanged || endChanged || statusChanged || remarkChanged || actualEndChanged || percentageChanged) {
             return true;
           }
         }
@@ -283,41 +290,24 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
 
     if (hasNewlyCompleted) {
       setIsConfirmClientOpen(true);
-    } else if (hasNewlyAllottedMilestones(mappedMilestones)) {
-      setIsConfirmFprOpen(true);
     } else {
-      onSubmit(mappedMilestones, false, false);
+      const notifyFpr = hasNewlyAllottedMilestones(mappedMilestones);
+      onSubmit(mappedMilestones, false, notifyFpr);
     }
   };
 
   const handleConfirmClientEmail = () => {
     setIsConfirmClientOpen(false);
     setSendClientMailFlag(true);
-    if (hasNewlyAllottedMilestones(pendingMilestones)) {
-      setIsConfirmFprOpen(true);
-    } else {
-      onSubmit(pendingMilestones, true, false);
-    }
+    const notifyFpr = hasNewlyAllottedMilestones(pendingMilestones);
+    onSubmit(pendingMilestones, true, notifyFpr);
   };
 
   const handleCancelClientEmail = () => {
     setIsConfirmClientOpen(false);
     setSendClientMailFlag(false);
-    if (hasNewlyAllottedMilestones(pendingMilestones)) {
-      setIsConfirmFprOpen(true);
-    } else {
-      onSubmit(pendingMilestones, false, false);
-    }
-  };
-
-  const handleConfirmFprEmail = () => {
-    setIsConfirmFprOpen(false);
-    onSubmit(pendingMilestones, sendClientMailFlag, true);
-  };
-
-  const handleCancelFprEmail = () => {
-    setIsConfirmFprOpen(false);
-    onSubmit(pendingMilestones, sendClientMailFlag, false);
+    const notifyFpr = hasNewlyAllottedMilestones(pendingMilestones);
+    onSubmit(pendingMilestones, false, notifyFpr);
   };
 
   const completedPercentage = localMilestones.reduce((acc, m) => m.status === 'Completed' ? acc + (m.percentage || 0) : acc, 0);
@@ -687,15 +677,6 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
         cancelText="No"
         onConfirm={handleConfirmClientEmail}
         onClose={handleCancelClientEmail}
-      />
-      <ConfirmModal
-        isOpen={isConfirmFprOpen}
-        title="Send FPR Update"
-        message="Do you want to send the milestone allotment email to the FPR?"
-        confirmText="Yes"
-        cancelText="No"
-        onConfirm={handleConfirmFprEmail}
-        onClose={handleCancelFprEmail}
       />
     </div>
   );
