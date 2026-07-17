@@ -544,8 +544,8 @@ h1, h2, h3, h4, h5, h6 {
 .header-filter-dropdown {
   position: absolute;
   top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  transform: none;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 12px;
