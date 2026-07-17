@@ -349,6 +349,9 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [enquiryToDelete, setEnquiryToDelete] = useState(null);
   
+  // Enquiry Details Popup state
+  const [enqDetailsPopup, setEnqDetailsPopup] = useState(null);
+  
   // Milestone Modal state
   const [isMilestoneModalOpen, setIsMilestoneModalOpen] = useState(false);
   const [enquiryForMilestone, setEnquiryForMilestone] = useState(null);
@@ -1051,7 +1054,13 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                           </a>
                         </td>
                         <td style={{ minWidth: '180px', maxWidth: '300px', fontSize: '0.88rem' }}>
-                          {enq.enquiryDetails}
+                          <div 
+                            className="clamp-2-lines" 
+                            onClick={() => setEnqDetailsPopup(enq.enquiryDetails)}
+                            title="Click to view full details"
+                          >
+                            {enq.enquiryDetails}
+                          </div>
                         </td>
                         <td>{enq.majorEquipments}</td>
                         <td>{enq.enquirySource}</td>
@@ -1234,6 +1243,26 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
         token={token}
         showSuccessToast={showSuccessToast}
       />
+
+      {/* Enquiry Details Popup Modal */}
+      {enqDetailsPopup && (
+        <div className="modal-overlay" onClick={() => setEnqDetailsPopup(null)} style={{ zIndex: 1100 }}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px', borderRadius: '16px' }}>
+            <div className="modal-header">
+              <h3 className="modal-title">Enquiry Details</h3>
+              <button className="close-btn" onClick={() => setEnqDetailsPopup(null)}>✕</button>
+            </div>
+            <div className="modal-body" style={{ maxHeight: '60vh', overflowY: 'auto', whiteSpace: 'pre-wrap', lineHeight: '1.6', fontSize: '0.95rem', color: 'var(--text-primary)', textAlign: 'left', padding: '16px 24px' }}>
+              {enqDetailsPopup}
+            </div>
+            <div className="modal-footer" style={{ borderTop: '1px solid var(--border-color)', paddingTop: '12px', paddingRight: '24px', paddingBottom: '16px', display: 'flex', justifyContent: 'flex-end' }}>
+              <button className="action-btn" style={{ background: 'var(--accent-primary)', color: '#ffffff', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }} onClick={() => setEnqDetailsPopup(null)}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Toast Success Message */}
       {successToast.visible && (
