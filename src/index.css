@@ -4120,3 +4120,36 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(255, 255, 255, 0.5);
   color: #64748b;
 }
+
+/* Cascading Sticky Search and Table Headers (Desktop-only) */
+@media (min-width: 1025px) {
+  .dashboard-header {
+    height: 70px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+  }
+  .controls-bar {
+    position: sticky;
+    top: 70px;
+    z-index: 99;
+    height: 74px;
+    box-sizing: border-box;
+    background: var(--bg-primary) !important;
+    display: flex;
+    align-items: center;
+  }
+  [data-theme="light"] .controls-bar {
+    background: var(--bg-primary) !important;
+  }
+  .custom-table th {
+    position: sticky;
+    top: 144px;
+    z-index: 98;
+    background: var(--bg-tertiary) !important;
+  }
+  [data-theme="light"] .custom-table th {
+    background: #dde4f4 !important;
+  }
+}
+
