@@ -871,56 +871,6 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-
-            <div className="filter-wrapper">
-              {/* Date Range Filter */}
-              <div className="date-range-container">
-                <span className="filter-label">Enq. Date:</span>
-                <input 
-                  type="date" 
-                  className="date-input"
-                  value={startDateFilter}
-                  onChange={(e) => setStartDateFilter(e.target.value)}
-                  placeholder="From"
-                  title="From Date"
-                />
-                <span className="filter-separator">to</span>
-                <input 
-                  type="date" 
-                  className="date-input"
-                  value={endDateFilter}
-                  onChange={(e) => setEndDateFilter(e.target.value)}
-                  placeholder="To"
-                  title="To Date"
-                />
-                {(startDateFilter || endDateFilter) && (
-                  <button 
-                    className="clear-date-btn"
-                    onClick={() => { setStartDateFilter(''); setEndDateFilter(''); }}
-                    title="Clear Date Filter"
-                  >
-                    ✕
-                  </button>
-                )}
-              </div>
-
-              {activeTab === 'enquiries' && (
-                <select 
-                  className="select-filter"
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                >
-                  <option value="">All Statuses</option>
-                  <option value="Costing">Costing</option>
-                  <option value="Offer submitted">Offer Submitted</option>
-                  <option value="Follow-up in progress">Follow-up In Progress</option>
-                  <option value="Negotiation ongoing">Negotiation Ongoing</option>
-                  <option value="Lost">Lost</option>
-                  <option value="Confirmed">Confirmed</option>
-                  <option value="-">-</option>
-                </select>
-              )}
-            </div>
           </div>
         )}
 
@@ -1013,7 +963,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                       <th>Contact Number</th>
                       <th>Mail ID</th>
                       <th>Enq Details</th>
-                      <th>major Equipments</th>
+                      <th>Major Equipments</th>
                       <th>Source</th>
                       <th>FPR</th>
                       <th>Quotation Number</th>
