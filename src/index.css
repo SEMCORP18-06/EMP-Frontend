@@ -595,26 +595,23 @@ h1, h2, h3, h4, h5, h6 {
 .table-responsive {
   width: 100%;
   overflow-x: auto;
-  overflow-y: auto;
-  max-height: calc(100vh - 360px);
   padding-bottom: 8px; /* space for scrollbar */
 }
 
-/* Custom Table Scrollbars (Both Horizontal & Vertical) */
+/* Custom Table Horizontal Scrollbar */
 .table-responsive::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  height: 10px;
 }
 
 .table-responsive::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.03);
-  border-radius: 4px;
+  border-radius: 5px;
 }
 
 .table-responsive::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.15);
-  border-radius: 4px;
-  border: 1px solid transparent;
+  border-radius: 5px;
+  border: 2px solid transparent;
   background-clip: padding-box;
   cursor: pointer;
 }
@@ -644,10 +641,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .custom-table th {
-  position: sticky;
-  top: 0;
-  z-index: 98;
-  background: var(--bg-tertiary);
+  background: rgba(17, 24, 39, 0.7);
   color: var(--text-secondary);
   padding: 18px 24px;
   font-family: var(--font-display);
@@ -2298,10 +2292,6 @@ h1, h2, h3, h4, h5, h6 {
   .custom-table th {
     font-size: 0.78rem;
     padding: 12px 10px;
-  }
-
-  .table-responsive {
-    max-height: 50vh;
   }
 
   .action-buttons {
