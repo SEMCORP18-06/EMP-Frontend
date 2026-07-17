@@ -4156,3 +4156,23 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(255, 255, 255, 0.5);
   color: #64748b;
 }
+
+/* Sticky Table Headers below Sticky Navbar (Desktop-only) */
+@media (min-width: 1025px) {
+  .dashboard-header {
+    height: 70px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+  }
+  .custom-table th {
+    position: sticky;
+    top: 70px; /* Sticks right below the sticky dashboard-header (70px) */
+    z-index: 98;
+    background: var(--bg-tertiary) !important;
+  }
+  [data-theme="light"] .custom-table th {
+    background: #dde4f4 !important;
+  }
+}
+
