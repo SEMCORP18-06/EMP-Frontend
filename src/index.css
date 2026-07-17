@@ -595,7 +595,43 @@ h1, h2, h3, h4, h5, h6 {
 .table-responsive {
   width: 100%;
   overflow-x: auto;
+  padding-bottom: 8px; /* space for scrollbar */
 }
+
+/* Custom Table Horizontal Scrollbar */
+.table-responsive::-webkit-scrollbar {
+  height: 10px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 5px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  cursor: pointer;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary);
+}
+
+[data-theme="light"] .table-responsive::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .table-responsive::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.18);
+}
+
+[data-theme="light"] .table-responsive::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary);
+}
+
 
 .custom-table {
   width: 100%;
