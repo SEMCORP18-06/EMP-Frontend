@@ -4159,15 +4159,16 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Sticky Table Headers below Sticky Navbar (Desktop-only) */
 @media (min-width: 1025px) {
-  .dashboard-header {
-    height: 70px;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
+  .dashboard-container {
+    height: 100vh;
+    overflow: hidden;
+  }
+  .dashboard-main {
+    overflow-y: auto;
   }
   .custom-table th {
     position: sticky;
-    top: 70px; /* Sticks right below the sticky dashboard-header (70px) */
+    top: 0; /* Sticks right below the sticky dashboard-header since dashboard-main starts below header */
     z-index: 98;
     background: var(--bg-tertiary) !important;
   }
