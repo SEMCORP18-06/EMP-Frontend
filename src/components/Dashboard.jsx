@@ -338,6 +338,8 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
   // Search & Filter state
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [startDateFilter, setStartDateFilter] = useState('');
+  const [endDateFilter, setEndDateFilter] = useState('');
   
   // Modals state
   const [isEnquiryModalOpen, setIsEnquiryModalOpen] = useState(false);
@@ -423,8 +425,16 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
       result = result.filter(enq => enq.currentStatus === statusFilter);
     }
 
+    if (startDateFilter) {
+      result = result.filter(enq => enq.date && enq.date !== '-' && enq.date >= startDateFilter);
+    }
+
+    if (endDateFilter) {
+      result = result.filter(enq => enq.date && enq.date !== '-' && enq.date <= endDateFilter);
+    }
+
     setFilteredEnquiries(result);
-  }, [searchTerm, statusFilter, enquiries, activeTab]);
+  }, [searchTerm, statusFilter, startDateFilter, endDateFilter, enquiries, activeTab]);
 
   // Add or Edit Submission
   const handleEnquirySubmit = async (formData) => {
@@ -702,6 +712,8 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
               setActiveTab('enquiries');
               setSearchTerm('');
               setStatusFilter('');
+              setStartDateFilter('');
+              setEndDateFilter('');
             }}
           >
             Enquiries
@@ -712,6 +724,8 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
               setActiveTab('milestones');
               setSearchTerm('');
               setStatusFilter('');
+              setStartDateFilter('');
+              setEndDateFilter('');
             }}
           >
             Confirmed Orders
@@ -722,6 +736,8 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
               setActiveTab('analytics');
               setSearchTerm('');
               setStatusFilter('');
+              setStartDateFilter('');
+              setEndDateFilter('');
             }}
           >
             Dashboard
@@ -848,8 +864,39 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
               />
             </div>
 
-            {activeTab === 'enquiries' && (
-              <div className="filter-wrapper">
+            <div className="filter-wrapper">
+              {/* Date Range Filter */}
+              <div className="date-range-container">
+                <span className="filter-label">Enq. Date:</span>
+                <input 
+                  type="date" 
+                  className="date-input"
+                  value={startDateFilter}
+                  onChange={(e) => setStartDateFilter(e.target.value)}
+                  placeholder="From"
+                  title="From Date"
+                />
+                <span className="filter-separator">to</span>
+                <input 
+                  type="date" 
+                  className="date-input"
+                  value={endDateFilter}
+                  onChange={(e) => setEndDateFilter(e.target.value)}
+                  placeholder="To"
+                  title="To Date"
+                />
+                {(startDateFilter || endDateFilter) && (
+                  <button 
+                    className="clear-date-btn"
+                    onClick={() => { setStartDateFilter(''); setEndDateFilter(''); }}
+                    title="Clear Date Filter"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+
+              {activeTab === 'enquiries' && (
                 <select 
                   className="select-filter"
                   value={statusFilter}
@@ -864,8 +911,8 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                   <option value="Confirmed">Confirmed</option>
                   <option value="-">-</option>
                 </select>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         )}
 
