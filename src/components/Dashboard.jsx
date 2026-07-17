@@ -340,6 +340,8 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
   const [statusFilter, setStatusFilter] = useState('');
   const [startDateFilter, setStartDateFilter] = useState('');
   const [endDateFilter, setEndDateFilter] = useState('');
+  const [showDateDropdown, setShowDateDropdown] = useState(false);
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   
   // Modals state
   const [isEnquiryModalOpen, setIsEnquiryModalOpen] = useState(false);
@@ -714,6 +716,8 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
               setStatusFilter('');
               setStartDateFilter('');
               setEndDateFilter('');
+              setShowDateDropdown(false);
+              setShowStatusDropdown(false);
             }}
           >
             Enquiries
@@ -726,6 +730,8 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
               setStatusFilter('');
               setStartDateFilter('');
               setEndDateFilter('');
+              setShowDateDropdown(false);
+              setShowStatusDropdown(false);
             }}
           >
             Confirmed Orders
@@ -738,6 +744,8 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
               setStatusFilter('');
               setStartDateFilter('');
               setEndDateFilter('');
+              setShowDateDropdown(false);
+              setShowStatusDropdown(false);
             }}
           >
             Dashboard
@@ -935,7 +943,68 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                 <table className="custom-table">
                   <thead>
                     <tr>
-                      <th>Enq Date</th>
+                      <th style={{ position: 'relative' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                          <span>Enq Date</span>
+                          <button 
+                            onClick={() => {
+                              setShowDateDropdown(!showDateDropdown);
+                              setShowStatusDropdown(false);
+                            }}
+                            style={{ 
+                              background: 'none', 
+                              border: 'none', 
+                              cursor: 'pointer', 
+                              padding: '2px', 
+                              fontSize: '0.85rem', 
+                              color: (startDateFilter || endDateFilter) ? 'var(--accent-primary)' : 'var(--text-muted)',
+                              display: 'inline-flex', 
+                              alignItems: 'center' 
+                            }}
+                            title="Filter by Date"
+                          >
+                            🔍
+                          </button>
+                        </div>
+                        {showDateDropdown && (
+                          <div className="header-filter-dropdown">
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                              <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>From Date:</label>
+                              <input 
+                                type="date" 
+                                className="select-filter"
+                                style={{ width: '100%' }}
+                                value={startDateFilter}
+                                onChange={(e) => setStartDateFilter(e.target.value)}
+                              />
+                            </div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                              <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>To Date:</label>
+                              <input 
+                                type="date" 
+                                className="select-filter"
+                                style={{ width: '100%' }}
+                                value={endDateFilter}
+                                onChange={(e) => setEndDateFilter(e.target.value)}
+                              />
+                            </div>
+                            <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                              <button 
+                                onClick={() => { setStartDateFilter(''); setEndDateFilter(''); setShowDateDropdown(false); }}
+                                style={{ flex: 1, padding: '6px 12px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-primary)', cursor: 'pointer', fontSize: '0.8rem' }}
+                              >
+                                Clear
+                              </button>
+                              <button 
+                                onClick={() => setShowDateDropdown(false)}
+                                style={{ flex: 1, padding: '6px 12px', borderRadius: '6px', border: 'none', background: 'var(--accent-primary)', color: '#ffffff', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}
+                              >
+                                Apply
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </th>
                       <th>Company Name</th>
                       <th>Client Name</th>
                       <th>Country Code</th>
@@ -946,7 +1015,66 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                       <th>Source</th>
                       <th>FPR</th>
                       <th>Quotation Number</th>
-                      <th>Status</th>
+                      <th style={{ position: 'relative' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                          <span>Status</span>
+                          <button 
+                            onClick={() => {
+                              setShowStatusDropdown(!showStatusDropdown);
+                              setShowDateDropdown(false);
+                            }}
+                            style={{ 
+                              background: 'none', 
+                              border: 'none', 
+                              cursor: 'pointer', 
+                              padding: '2px', 
+                              fontSize: '0.85rem', 
+                              color: statusFilter ? 'var(--accent-primary)' : 'var(--text-muted)',
+                              display: 'inline-flex', 
+                              alignItems: 'center' 
+                            }}
+                            title="Filter by Status"
+                          >
+                            🔍
+                          </button>
+                        </div>
+                        {showStatusDropdown && (
+                          <div className="header-filter-dropdown">
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                              <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Status:</label>
+                              <select 
+                                className="select-filter"
+                                style={{ width: '100%' }}
+                                value={statusFilter}
+                                onChange={(e) => setStatusFilter(e.target.value)}
+                              >
+                                <option value="">All Statuses</option>
+                                <option value="Costing">Costing</option>
+                                <option value="Offer submitted">Offer Submitted</option>
+                                <option value="Follow-up in progress">Follow-up In Progress</option>
+                                <option value="Negotiation ongoing">Negotiation Ongoing</option>
+                                <option value="Lost">Lost</option>
+                                <option value="Confirmed">Confirmed</option>
+                                <option value="-">-</option>
+                              </select>
+                            </div>
+                            <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                              <button 
+                                onClick={() => { setStatusFilter(''); setShowStatusDropdown(false); }}
+                                style={{ flex: 1, padding: '6px 12px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-primary)', cursor: 'pointer', fontSize: '0.8rem' }}
+                              >
+                                Clear
+                              </button>
+                              <button 
+                                onClick={() => setShowStatusDropdown(false)}
+                                style={{ flex: 1, padding: '6px 12px', borderRadius: '6px', border: 'none', background: 'var(--accent-primary)', color: '#ffffff', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}
+                              >
+                                Apply
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </th>
                       <th>Offter Sub Date</th>
                       <th>PO Number</th>
                       <th>Expected Dispatch Date</th>
