@@ -379,27 +379,6 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
 
   const isAdmin = userRole === 'Admin';
 
-  useEffect(() => {
-    const updateHeights = () => {
-      const header = document.querySelector('.dashboard-header');
-      const controls = document.querySelector('.controls-bar');
-      if (header) {
-        document.documentElement.style.setProperty('--header-height', `${header.offsetHeight}px`);
-      }
-      if (controls) {
-        document.documentElement.style.setProperty('--controls-height', `${controls.offsetHeight}px`);
-      }
-    };
-
-    updateHeights();
-    window.addEventListener('resize', updateHeights);
-    const timer = setTimeout(updateHeights, 150);
-    return () => {
-      window.removeEventListener('resize', updateHeights);
-      clearTimeout(timer);
-    };
-  }, [activeTab, enquiries, filteredEnquiries]);
-
   const fetchEnquiries = async () => {
     setLoading(true);
     setError('');
