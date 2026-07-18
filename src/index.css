@@ -2949,11 +2949,15 @@ h1, h2, h3, h4, h5, h6 {
   vertical-align: middle !important;
 }
 
-/* Left alignment and specific padding for Milestone and Remarks cells only */
-.milestone-table td.col-milestone,
-.milestone-table td.col-remark {
+/* Left alignment for Milestone and Center alignment for Remarks */
+.milestone-table td.col-milestone {
   text-align: left !important;
   padding-left: 14px !important;
+}
+
+.milestone-table td.col-remark {
+  text-align: center !important;
+  padding: 6px 4px !important;
 }
 
 .milestone-table .table-input[type="date"] {

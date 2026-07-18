@@ -369,15 +369,15 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
               <table className="custom-table milestone-table" style={{ width: '100%' }}>
                 <thead>
                   <tr>
-                    <th className="col-milestone" style={{ width: isAdmin ? '24%' : '28%' }}>Milestone <span style={{ color: 'red' }}>*</span></th>
+                    <th className="col-milestone" style={{ width: isAdmin ? '22%' : '26%' }}>Milestone <span style={{ color: 'red' }}>*</span></th>
                     <th style={{ width: isAdmin ? '11%' : '12%' }}>FPR</th>
-                    <th style={{ width: '11%' }}>Start Date</th>
-                    <th style={{ width: '11%' }}>End Date</th>
-                    <th style={{ width: '11%' }}>Actual End Date</th>
-                    <th style={{ width: '11%' }}>Status</th>
-                    <th className="col-remark" style={{ width: isAdmin ? '11%' : '12%' }}>Remark</th>
-                    <th style={{ width: '8%' }}>Weight (%)</th>
-                    {isAdmin && <th style={{ width: '6%' }}>Action</th>}
+                    <th style={{ width: '10.5%' }}>Start Date</th>
+                    <th style={{ width: '10.5%' }}>End Date</th>
+                    <th style={{ width: '10.5%' }}>Actual End Date</th>
+                    <th style={{ width: '10.5%' }}>Status</th>
+                    <th className="col-remark" style={{ width: isAdmin ? '13.5%' : '14.5%' }}>Remark</th>
+                    <th style={{ width: '7.5%' }}>Weight (%)</th>
+                    {isAdmin && <th style={{ width: '4%' }}>Action</th>}
                   </tr>
                 </thead>
                 <tbody>
