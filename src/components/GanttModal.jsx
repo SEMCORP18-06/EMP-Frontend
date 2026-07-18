@@ -443,25 +443,33 @@ export default function GanttModal({ isOpen, onClose, enquiry, showSuccessToast 
                   </label>
                 </div>
 
-                {/* Drag and Drop Image Upload Section */}
+                {/* File Attachment Dropzone Section */}
                 <div className="form-group">
-                  <label>Attach Site Photos / Progress Images:</label>
+                  <label style={{ display: 'block', marginBottom: '6px', fontWeight: '600', color: 'var(--text-primary)' }}>
+                    📎 Attach Files / Site Photos / Inspection Reports:
+                  </label>
+                  
                   <div 
-                    className="gantt-image-dropzone"
+                    className="gantt-file-dropzone"
                     onDragOver={handleDragOver}
                     onDrop={handleDrop}
                   >
                     <input 
                       type="file" 
-                      accept="image/*" 
+                      accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" 
                       multiple 
                       onChange={handleFileChange}
                       id="imageFileInput"
                       style={{ display: 'none' }}
                     />
                     <label htmlFor="imageFileInput" className="gantt-dropzone-label">
-                      <span style={{ fontSize: '1.4rem', display: 'block', marginBottom: '2px' }}>📷</span>
-                      <span>Click or Drag & Drop site/progress images here</span>
+                      <span style={{ fontSize: '1.6rem', display: 'block', marginBottom: '2px' }}>📁</span>
+                      <span style={{ fontSize: '0.88rem', fontWeight: '600', color: 'var(--accent-primary)' }}>
+                        Click to browse or Drag & Drop files here
+                      </span>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                        Supports Images, PDFs, Inspection Reports & Documents
+                      </span>
                     </label>
                   </div>
 
@@ -469,13 +477,19 @@ export default function GanttModal({ isOpen, onClose, enquiry, showSuccessToast 
                     <div className="gantt-image-preview-grid">
                       {images.map((img, idx) => (
                         <div key={idx} className="gantt-image-preview-card">
-                          <img src={img.data} alt={img.name} />
+                          {img.data && img.data.startsWith('data:image/') ? (
+                            <img src={img.data} alt={img.name} />
+                          ) : (
+                            <div className="gantt-file-icon-placeholder">
+                              {img.name.endsWith('.pdf') ? '📄' : img.name.match(/\.(xls|xlsx)$/i) ? '📊' : '📎'}
+                            </div>
+                          )}
                           <span className="gantt-image-name" title={img.name}>{img.name}</span>
                           <button 
                             type="button" 
                             className="gantt-remove-img-btn"
                             onClick={() => removeImage(idx)}
-                            title="Remove image"
+                            title="Remove attachment"
                           >
                             &times;
                           </button>
