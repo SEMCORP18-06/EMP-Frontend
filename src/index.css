@@ -3299,13 +3299,8 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid rgba(75, 85, 99, 0.3);
 }
 
-/* Rich Floating Details Tooltip Popover */
-.gantt-bar .gantt-tooltip {
-  visibility: hidden;
-  position: absolute;
-  bottom: 125%;
-  left: 50%;
-  transform: translateX(-50%);
+/* Dynamic Screen-Fixed Floating Popover (Immune to scroll container clipping) */
+.gantt-floating-popover {
   min-width: 260px;
   max-width: 320px;
   background: rgba(15, 23, 42, 0.96);
@@ -3316,24 +3311,32 @@ h1, h2, h3, h4, h5, h6 {
   color: #f8fafc;
   font-size: 0.8rem;
   box-shadow: 0 14px 32px rgba(0, 0, 0, 0.6);
-  z-index: 9999 !important;
-  opacity: 0;
-  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: none;
   display: flex;
   flex-direction: column;
   gap: 4px;
   line-height: 1.4;
+  animation: ganttPopoverFade 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.gantt-tooltip .tooltip-header {
+@keyframes ganttPopoverFade {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.gantt-floating-popover .tooltip-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 8px;
 }
 
-.gantt-tooltip .tooltip-title {
+.gantt-floating-popover .tooltip-title {
   font-size: 0.88rem;
   font-weight: 700;
   color: #ffffff;
@@ -3342,7 +3345,7 @@ h1, h2, h3, h4, h5, h6 {
   text-overflow: ellipsis;
 }
 
-.gantt-tooltip .tooltip-detail-grid {
+.gantt-floating-popover .tooltip-detail-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 4px 8px;
@@ -3350,76 +3353,27 @@ h1, h2, h3, h4, h5, h6 {
   color: #94a3b8;
 }
 
-.gantt-tooltip .tooltip-detail-grid strong {
+.gantt-floating-popover .tooltip-detail-grid strong {
   color: #e2e8f0;
 }
 
-/* Arrow for tooltip */
-.gantt-bar .gantt-tooltip::after {
+.gantt-floating-popover::after {
   content: "";
   position: absolute;
-  top: 100%;
   left: 50%;
   transform: translateX(-50%);
   border-width: 6px;
   border-style: solid;
+}
+
+.gantt-floating-popover.top::after {
+  top: 100%;
   border-color: rgba(15, 23, 42, 0.96) transparent transparent transparent;
 }
 
-/* Horizontal Alignment Variations */
-.gantt-tooltip.align-left {
-  left: 0 !important;
-  transform: none !important;
-}
-.gantt-tooltip.align-left::after {
-  left: 20px !important;
-  transform: none !important;
-}
-
-.gantt-tooltip.align-right {
-  left: auto !important;
-  right: 0 !important;
-  transform: none !important;
-}
-.gantt-tooltip.align-right::after {
-  left: auto !important;
-  right: 20px !important;
-  transform: none !important;
-}
-
-.gantt-bar:hover .gantt-tooltip {
-  visibility: visible;
-  opacity: 1;
-}
-
-.gantt-bar:hover .gantt-tooltip.align-center {
-  transform: translateX(-50%) translateY(-4px);
-}
-
-.gantt-bar:hover .gantt-tooltip.align-left,
-.gantt-bar:hover .gantt-tooltip.align-right {
-  transform: translateY(-4px);
-}
-
-/* Top Rows (1st, 2nd, 3rd rows): Float Tooltip BELOW the bar graph to prevent top margin clipping */
-.gantt-row:nth-child(-n+3) .gantt-bar .gantt-tooltip {
-  bottom: auto !important;
-  top: 125% !important;
-}
-
-.gantt-row:nth-child(-n+3) .gantt-bar .gantt-tooltip::after {
-  top: auto !important;
-  bottom: 100% !important;
-  border-color: transparent transparent rgba(15, 23, 42, 0.96) transparent !important;
-}
-
-.gantt-row:nth-child(-n+3) .gantt-bar:hover .gantt-tooltip.align-center {
-  transform: translateX(-50%) translateY(4px) !important;
-}
-
-.gantt-row:nth-child(-n+3) .gantt-bar:hover .gantt-tooltip.align-left,
-.gantt-row:nth-child(-n+3) .gantt-bar:hover .gantt-tooltip.align-right {
-  transform: translateY(4px) !important;
+.gantt-floating-popover.bottom::after {
+  bottom: 100%;
+  border-color: transparent transparent rgba(15, 23, 42, 0.96) transparent;
 }
 
 /* Responsive adjustments for Gantt */

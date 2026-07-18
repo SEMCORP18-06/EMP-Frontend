@@ -13,6 +13,9 @@ export default function GanttModal({ isOpen, onClose, enquiry, showSuccessToast 
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
+  const [hoveredMilestone, setHoveredMilestone] = useState(null);
+  const [popoverPos, setPopoverPos] = useState({ x: 0, y: 0, placement: 'top' });
+
   useEffect(() => {
     if (enquiry) {
       setEmailTo(enquiry.mailId || '');
@@ -23,8 +26,36 @@ export default function GanttModal({ isOpen, onClose, enquiry, showSuccessToast 
       setErrorMsg('');
       setSuccessMsg('');
       setIsSending(false);
+      setHoveredMilestone(null);
     }
   }, [enquiry]);
+
+  const handleBarMouseEnter = (e, m, durationInDays) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    
+    // Check space above relative to viewport: if rect.top < 230px, position BELOW the bar!
+    const placement = rect.top < 230 ? 'bottom' : 'top';
+    
+    // Calculate horizontal center, capped within window bounds
+    let centerX = rect.left + rect.width / 2;
+    if (centerX < 150) centerX = 150;
+    if (centerX > window.innerWidth - 150) centerX = window.innerWidth - 150;
+
+    setHoveredMilestone({
+      ...m,
+      durationInDays
+    });
+
+    setPopoverPos({
+      x: centerX,
+      y: placement === 'top' ? rect.top - 8 : rect.bottom + 8,
+      placement
+    });
+  };
+
+  const handleBarMouseLeave = () => {
+    setHoveredMilestone(null);
+  };
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
@@ -261,7 +292,7 @@ export default function GanttModal({ isOpen, onClose, enquiry, showSuccessToast 
               </p>
             </div>
           ) : (
-            <div className="gantt-chart-container">
+            <div className="gantt-chart-container" onScroll={() => setHoveredMilestone(null)}>
               {/* Gantt Header Timeline Grid Labels */}
               <div className="gantt-timeline-header">
                 <div className="gantt-sidebar-placeholder" />
@@ -307,13 +338,6 @@ export default function GanttModal({ isOpen, onClose, enquiry, showSuccessToast 
                     durationInDays = Math.ceil((m.end.getTime() - m.start.getTime()) / (24 * 60 * 60 * 1000)) + 1;
                   }
 
-                  let tooltipAlignClass = 'align-center';
-                  if (leftPercent < 20) {
-                    tooltipAlignClass = 'align-left';
-                  } else if (leftPercent > 70 || (leftPercent + widthPercent > 80)) {
-                    tooltipAlignClass = 'align-right';
-                  }
-
                   return (
                     <div key={idx} className="gantt-row">
                       {/* Left Sidebar Info */}
@@ -342,50 +366,12 @@ export default function GanttModal({ isOpen, onClose, enquiry, showSuccessToast 
                           <div 
                             className={`gantt-bar ${getStatusColorClass(m.status)}`}
                             style={{ left: `${leftPercent}%`, width: `${widthPercent}%` }}
+                            onMouseEnter={(e) => handleBarMouseEnter(e, m, durationInDays)}
+                            onMouseLeave={handleBarMouseLeave}
                           >
                             <span className="gantt-bar-label">
                               {durationInDays}d
                             </span>
-                                                        {/* Rich Complete Details Hover Tooltip Popover */}
-                             <div className={`gantt-tooltip ${tooltipAlignClass}`}>
-                               <div className="tooltip-header">
-                                 <span className="tooltip-title">{m.name}</span>
-                                 <span className={`status-badge ${getStatusColorClass(m.status)}`} style={{ fontSize: '0.68rem', padding: '2px 6px' }}>
-                                   {m.status}
-                                 </span>
-                               </div>
-
-                               <hr style={{ border: 'none', borderTop: '1px solid rgba(255, 255, 255, 0.12)', margin: '6px 0' }} />
-
-                               <div className="tooltip-detail-grid">
-                                 <div><strong>FPR:</strong> <span>{m.fpr || '-'}</span></div>
-                                 <div><strong>Weight:</strong> <span>{m.percentage || 0}%</span></div>
-                                 <div><strong>Start Date:</strong> <span>{m.startDate || '-'}</span></div>
-                                 <div><strong>End Date:</strong> <span>{m.endDate || '-'}</span></div>
-                                 {m.actualEndDate && <div><strong>Actual End Date:</strong> <span>{m.actualEndDate}</span></div>}
-                                 <div><strong>Duration:</strong> <span>{durationInDays} day{durationInDays > 1 ? 's' : ''}</span></div>
-                               </div>
-
-                               {/* Remarks Section */}
-                               {(m.remarks && m.remarks.length > 0) ? (
-                                 <div className="tooltip-remarks-section" style={{ marginTop: '6px', paddingTop: '6px', borderTop: '1px dashed rgba(255, 255, 255, 0.15)' }}>
-                                   <strong style={{ fontSize: '0.72rem', color: 'var(--accent-primary)' }}>💬 Remarks ({m.remarks.length}):</strong>
-                                   <div style={{ fontSize: '0.72rem', fontStyle: 'italic', color: '#cbd5e1', marginTop: '2px', maxHeight: '60px', overflowY: 'auto' }}>
-                                     "{m.remarks[m.remarks.length - 1].text}"
-                                     <div style={{ fontSize: '0.65rem', opacity: 0.7, textAlign: 'right', marginTop: '1px' }}>
-                                       — {m.remarks[m.remarks.length - 1].authorName || 'User'}
-                                     </div>
-                                   </div>
-                                 </div>
-                               ) : m.remark ? (
-                                 <div className="tooltip-remarks-section" style={{ marginTop: '6px', paddingTop: '6px', borderTop: '1px dashed rgba(255, 255, 255, 0.15)' }}>
-                                   <strong style={{ fontSize: '0.72rem', color: 'var(--accent-primary)' }}>💬 Remark:</strong>
-                                   <div style={{ fontSize: '0.72rem', fontStyle: 'italic', color: '#cbd5e1', marginTop: '2px' }}>
-                                     "{m.remark}"
-                                   </div>
-                                 </div>
-                               ) : null}
-                             </div>
                           </div>
                         ) : (
                           <div className="gantt-bar-unconfigured">
@@ -555,6 +541,59 @@ export default function GanttModal({ isOpen, onClose, enquiry, showSuccessToast 
             )}
           </div>
         </div>
+
+        {/* Dynamic Screen-Fixed Floating Popover (Immune to scroll container clipping) */}
+        {hoveredMilestone && (
+          <div 
+            className={`gantt-floating-popover ${popoverPos.placement}`}
+            style={{
+              position: 'fixed',
+              left: `${popoverPos.x}px`,
+              top: `${popoverPos.y}px`,
+              transform: popoverPos.placement === 'top' ? 'translate(-50%, -100%)' : 'translate(-50%, 0)',
+              zIndex: 999999,
+              pointerEvents: 'none'
+            }}
+          >
+            <div className="tooltip-header">
+              <span className="tooltip-title">{hoveredMilestone.name}</span>
+              <span className={`status-badge ${getStatusColorClass(hoveredMilestone.status)}`} style={{ fontSize: '0.68rem', padding: '2px 6px' }}>
+                {hoveredMilestone.status}
+              </span>
+            </div>
+
+            <hr style={{ border: 'none', borderTop: '1px solid rgba(255, 255, 255, 0.12)', margin: '6px 0' }} />
+
+            <div className="tooltip-detail-grid">
+              <div><strong>FPR:</strong> <span>{hoveredMilestone.fpr || '-'}</span></div>
+              <div><strong>Weight:</strong> <span>{hoveredMilestone.percentage || 0}%</span></div>
+              <div><strong>Start Date:</strong> <span>{hoveredMilestone.startDate || '-'}</span></div>
+              <div><strong>End Date:</strong> <span>{hoveredMilestone.endDate || '-'}</span></div>
+              {hoveredMilestone.actualEndDate && <div><strong>Actual End Date:</strong> <span>{hoveredMilestone.actualEndDate}</span></div>}
+              <div><strong>Duration:</strong> <span>{hoveredMilestone.durationInDays} day{hoveredMilestone.durationInDays > 1 ? 's' : ''}</span></div>
+            </div>
+
+            {/* Remarks Section */}
+            {(hoveredMilestone.remarks && hoveredMilestone.remarks.length > 0) ? (
+              <div className="tooltip-remarks-section" style={{ marginTop: '6px', paddingTop: '6px', borderTop: '1px dashed rgba(255, 255, 255, 0.15)' }}>
+                <strong style={{ fontSize: '0.72rem', color: 'var(--accent-primary)' }}>💬 Remarks ({hoveredMilestone.remarks.length}):</strong>
+                <div style={{ fontSize: '0.72rem', fontStyle: 'italic', color: '#cbd5e1', marginTop: '2px', maxHeight: '60px', overflowY: 'auto' }}>
+                  "{hoveredMilestone.remarks[hoveredMilestone.remarks.length - 1].text}"
+                  <div style={{ fontSize: '0.65rem', opacity: 0.7, textAlign: 'right', marginTop: '1px' }}>
+                    — {hoveredMilestone.remarks[hoveredMilestone.remarks.length - 1].authorName || 'User'}
+                  </div>
+                </div>
+              </div>
+            ) : hoveredMilestone.remark ? (
+              <div className="tooltip-remarks-section" style={{ marginTop: '6px', paddingTop: '6px', borderTop: '1px dashed rgba(255, 255, 255, 0.15)' }}>
+                <strong style={{ fontSize: '0.72rem', color: 'var(--accent-primary)' }}>💬 Remark:</strong>
+                <div style={{ fontSize: '0.72rem', fontStyle: 'italic', color: '#cbd5e1', marginTop: '2px' }}>
+                  "{hoveredMilestone.remark}"
+                </div>
+              </div>
+            ) : null}
+          </div>
+        )}
       </div>
     </div>
   );
