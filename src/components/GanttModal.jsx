@@ -307,6 +307,13 @@ export default function GanttModal({ isOpen, onClose, enquiry, showSuccessToast 
                     durationInDays = Math.ceil((m.end.getTime() - m.start.getTime()) / (24 * 60 * 60 * 1000)) + 1;
                   }
 
+                  let tooltipAlignClass = 'align-center';
+                  if (leftPercent < 20) {
+                    tooltipAlignClass = 'align-left';
+                  } else if (leftPercent > 70 || (leftPercent + widthPercent > 80)) {
+                    tooltipAlignClass = 'align-right';
+                  }
+
                   return (
                     <div key={idx} className="gantt-row">
                       {/* Left Sidebar Info */}
@@ -340,7 +347,7 @@ export default function GanttModal({ isOpen, onClose, enquiry, showSuccessToast 
                               {durationInDays}d
                             </span>
                                                         {/* Rich Complete Details Hover Tooltip Popover */}
-                             <div className="gantt-tooltip">
+                             <div className={`gantt-tooltip ${tooltipAlignClass}`}>
                                <div className="tooltip-header">
                                  <span className="tooltip-title">{m.name}</span>
                                  <span className={`status-badge ${getStatusColorClass(m.status)}`} style={{ fontSize: '0.68rem', padding: '2px 6px' }}>

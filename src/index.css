@@ -3366,10 +3366,60 @@ h1, h2, h3, h4, h5, h6 {
   border-color: rgba(15, 23, 42, 0.96) transparent transparent transparent;
 }
 
+/* Horizontal Alignment Variations */
+.gantt-tooltip.align-left {
+  left: 0 !important;
+  transform: none !important;
+}
+.gantt-tooltip.align-left::after {
+  left: 20px !important;
+  transform: none !important;
+}
+
+.gantt-tooltip.align-right {
+  left: auto !important;
+  right: 0 !important;
+  transform: none !important;
+}
+.gantt-tooltip.align-right::after {
+  left: auto !important;
+  right: 20px !important;
+  transform: none !important;
+}
+
 .gantt-bar:hover .gantt-tooltip {
   visibility: visible;
   opacity: 1;
+}
+
+.gantt-bar:hover .gantt-tooltip.align-center {
   transform: translateX(-50%) translateY(-4px);
+}
+
+.gantt-bar:hover .gantt-tooltip.align-left,
+.gantt-bar:hover .gantt-tooltip.align-right {
+  transform: translateY(-4px);
+}
+
+/* Top Rows (1st, 2nd, 3rd rows): Float Tooltip BELOW the bar graph to prevent top margin clipping */
+.gantt-row:nth-child(-n+3) .gantt-bar .gantt-tooltip {
+  bottom: auto !important;
+  top: 125% !important;
+}
+
+.gantt-row:nth-child(-n+3) .gantt-bar .gantt-tooltip::after {
+  top: auto !important;
+  bottom: 100% !important;
+  border-color: transparent transparent rgba(15, 23, 42, 0.96) transparent !important;
+}
+
+.gantt-row:nth-child(-n+3) .gantt-bar:hover .gantt-tooltip.align-center {
+  transform: translateX(-50%) translateY(4px) !important;
+}
+
+.gantt-row:nth-child(-n+3) .gantt-bar:hover .gantt-tooltip.align-left,
+.gantt-row:nth-child(-n+3) .gantt-bar:hover .gantt-tooltip.align-right {
+  transform: translateY(4px) !important;
 }
 
 /* Responsive adjustments for Gantt */
