@@ -3096,7 +3096,7 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 14px;
-  padding: 14px 18px 20px 18px;
+  padding: 8px 16px 16px 16px !important;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
   flex: 1 1 75% !important;
   height: 75% !important;
@@ -3109,9 +3109,12 @@ h1, h2, h3, h4, h5, h6 {
 /* Sticky Header Timeline */
 .gantt-timeline-header {
   display: flex;
+  align-items: center;
   border-bottom: 1px solid var(--border-color);
-  padding-bottom: 8px;
-  margin-bottom: 10px;
+  padding-top: 0 !important;
+  padding-bottom: 4px !important;
+  margin-top: 0 !important;
+  margin-bottom: 6px !important;
   position: sticky;
   top: 0;
   background: var(--bg-secondary);
@@ -3126,18 +3129,21 @@ h1, h2, h3, h4, h5, h6 {
   left: 0;
   background: var(--bg-secondary);
   z-index: 15;
+  height: 18px;
 }
 
 .gantt-timeline-track-header {
   position: relative;
   width: 75% !important;
   flex-grow: 1 !important;
-  height: 22px;
+  height: 18px;
 }
 
 .gantt-grid-label {
   position: absolute;
-  font-size: 0.74rem;
+  top: 0;
+  line-height: 1;
+  font-size: 0.72rem;
   font-weight: 600;
   color: var(--text-secondary);
   white-space: nowrap;
