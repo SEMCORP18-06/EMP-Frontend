@@ -34,14 +34,11 @@ const formatTimestamp = (dateStr) => {
   if (!dateStr) return '';
   try {
     const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return dateStr;
-    return d.toLocaleString('en-US', {
+    if (isNaN(d.getTime())) return dateStr.split('T')[0] || dateStr;
+    return d.toLocaleDateString('en-GB', {
       day: '2-digit',
       month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
+      year: 'numeric'
     });
   } catch (e) {
     return dateStr;
