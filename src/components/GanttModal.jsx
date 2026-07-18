@@ -339,18 +339,46 @@ export default function GanttModal({ isOpen, onClose, enquiry, showSuccessToast 
                             <span className="gantt-bar-label">
                               {durationInDays}d
                             </span>
-                            
-                            {/* CSS Tooltip */}
-                            <div className="gantt-tooltip">
-                              <strong>{m.name}</strong>
-                              <hr style={{ border: 'none', borderTop: '1px solid rgba(255, 255, 255, 0.1)', margin: '6px 0' }} />
-                              <div><strong>Status:</strong> {m.status}</div>
-                              <div><strong>FPR:</strong> {m.fpr || '-'}</div>
-                              <div><strong>Dates:</strong> {m.startDate} to {m.endDate}</div>
-                              <div><strong>Duration:</strong> {durationInDays} day{durationInDays > 1 ? 's' : ''}</div>
-                              <div><strong>Weight:</strong> {m.percentage || 0}%</div>
-                              {m.remark && <div className="gantt-tooltip-remark" style={{ marginTop: '4px', fontStyle: 'italic', opacity: 0.8 }}><strong>Remark:</strong> {m.remark}</div>}
-                            </div>
+                                                        {/* Rich Complete Details Hover Tooltip Popover */}
+                             <div className="gantt-tooltip">
+                               <div className="tooltip-header">
+                                 <span className="tooltip-title">{m.name}</span>
+                                 <span className={`status-badge ${getStatusColorClass(m.status)}`} style={{ fontSize: '0.68rem', padding: '2px 6px' }}>
+                                   {m.status}
+                                 </span>
+                               </div>
+
+                               <hr style={{ border: 'none', borderTop: '1px solid rgba(255, 255, 255, 0.12)', margin: '6px 0' }} />
+
+                               <div className="tooltip-detail-grid">
+                                 <div><strong>FPR:</strong> <span>{m.fpr || '-'}</span></div>
+                                 <div><strong>Weight:</strong> <span>{m.percentage || 0}%</span></div>
+                                 <div><strong>Start Date:</strong> <span>{m.startDate || '-'}</span></div>
+                                 <div><strong>End Date:</strong> <span>{m.endDate || '-'}</span></div>
+                                 {m.actualEndDate && <div><strong>Actual End Date:</strong> <span>{m.actualEndDate}</span></div>}
+                                 <div><strong>Duration:</strong> <span>{durationInDays} day{durationInDays > 1 ? 's' : ''}</span></div>
+                               </div>
+
+                               {/* Remarks Section */}
+                               {(m.remarks && m.remarks.length > 0) ? (
+                                 <div className="tooltip-remarks-section" style={{ marginTop: '6px', paddingTop: '6px', borderTop: '1px dashed rgba(255, 255, 255, 0.15)' }}>
+                                   <strong style={{ fontSize: '0.72rem', color: 'var(--accent-primary)' }}>💬 Remarks ({m.remarks.length}):</strong>
+                                   <div style={{ fontSize: '0.72rem', fontStyle: 'italic', color: '#cbd5e1', marginTop: '2px', maxHeight: '60px', overflowY: 'auto' }}>
+                                     "{m.remarks[m.remarks.length - 1].text}"
+                                     <div style={{ fontSize: '0.65rem', opacity: 0.7, textAlign: 'right', marginTop: '1px' }}>
+                                       — {m.remarks[m.remarks.length - 1].authorName || 'User'}
+                                     </div>
+                                   </div>
+                                 </div>
+                               ) : m.remark ? (
+                                 <div className="tooltip-remarks-section" style={{ marginTop: '6px', paddingTop: '6px', borderTop: '1px dashed rgba(255, 255, 255, 0.15)' }}>
+                                   <strong style={{ fontSize: '0.72rem', color: 'var(--accent-primary)' }}>💬 Remark:</strong>
+                                   <div style={{ fontSize: '0.72rem', fontStyle: 'italic', color: '#cbd5e1', marginTop: '2px' }}>
+                                     "{m.remark}"
+                                   </div>
+                                 </div>
+                               ) : null}
+                             </div>
                           </div>
                         ) : (
                           <div className="gantt-bar-unconfigured">

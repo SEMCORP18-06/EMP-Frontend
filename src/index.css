@@ -3222,7 +3222,7 @@ h1, h2, h3, h4, h5, h6 {
   height: 38px;
   display: flex;
   align-items: center;
-  overflow: hidden;
+  overflow: visible !important;
   border-radius: 6px;
 }
 
@@ -3255,7 +3255,7 @@ h1, h2, h3, h4, h5, h6 {
   transform: translateY(-1px);
   filter: brightness(1.1);
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
-  z-index: 10 !important;
+  z-index: 100 !important;
 }
 
 .gantt-bar-label {
@@ -3299,30 +3299,59 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid rgba(75, 85, 99, 0.3);
 }
 
-/* Tooltip Styling */
+/* Rich Floating Details Tooltip Popover */
 .gantt-bar .gantt-tooltip {
   visibility: hidden;
   position: absolute;
-  bottom: 130%;
+  bottom: 125%;
   left: 50%;
   transform: translateX(-50%);
-  width: 250px;
-  background: rgba(15, 23, 42, 0.95);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  min-width: 260px;
+  max-width: 320px;
+  background: rgba(15, 23, 42, 0.96);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 10px;
   padding: 12px 14px;
-  color: #f9fafb;
-  font-size: 0.82rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-  z-index: 1300;
+  color: #f8fafc;
+  font-size: 0.8rem;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.6);
+  z-index: 9999 !important;
   opacity: 0;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   line-height: 1.4;
+}
+
+.gantt-tooltip .tooltip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.gantt-tooltip .tooltip-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gantt-tooltip .tooltip-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 8px;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.gantt-tooltip .tooltip-detail-grid strong {
+  color: #e2e8f0;
 }
 
 /* Arrow for tooltip */
@@ -3334,7 +3363,7 @@ h1, h2, h3, h4, h5, h6 {
   transform: translateX(-50%);
   border-width: 6px;
   border-style: solid;
-  border-color: rgba(15, 23, 42, 0.95) transparent transparent transparent;
+  border-color: rgba(15, 23, 42, 0.96) transparent transparent transparent;
 }
 
 .gantt-bar:hover .gantt-tooltip {
