@@ -3106,19 +3106,20 @@ h1, h2, h3, h4, h5, h6 {
   box-sizing: border-box;
 }
 
-/* Sticky Header Timeline */
+/* Sticky Header Timeline with Solid Fill & High Z-Index */
 .gantt-timeline-header {
   display: flex;
   align-items: center;
   border-bottom: 1px solid var(--border-color);
-  padding-top: 0 !important;
-  padding-bottom: 4px !important;
-  margin-top: 0 !important;
+  padding-top: 8px !important;
+  padding-bottom: 6px !important;
+  margin-top: -8px !important;
   margin-bottom: 6px !important;
   position: sticky;
-  top: 0;
-  background: var(--bg-secondary);
-  z-index: 20;
+  top: -8px;
+  background: var(--bg-secondary) !important;
+  z-index: 25 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
 .gantt-sidebar-placeholder {
@@ -3127,8 +3128,8 @@ h1, h2, h3, h4, h5, h6 {
   flex-shrink: 0 !important;
   position: sticky;
   left: 0;
-  background: var(--bg-secondary);
-  z-index: 15;
+  background: var(--bg-secondary) !important;
+  z-index: 30 !important;
   height: 18px;
 }
 
@@ -3137,6 +3138,8 @@ h1, h2, h3, h4, h5, h6 {
   width: 75% !important;
   flex-grow: 1 !important;
   height: 18px;
+  background: var(--bg-secondary) !important;
+  z-index: 25 !important;
 }
 
 .gantt-grid-label {
@@ -3179,8 +3182,8 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: center;
   position: sticky;
   left: 0;
-  background: var(--bg-secondary);
-  z-index: 12;
+  background: var(--bg-secondary) !important;
+  z-index: 15 !important;
 }
 
 .gantt-milestone-title {
@@ -3245,12 +3248,14 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   transition: var(--transition-smooth);
   user-select: none;
+  z-index: 5 !important;
 }
 
 .gantt-bar:hover {
   transform: translateY(-1px);
   filter: brightness(1.1);
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+  z-index: 10 !important;
 }
 
 .gantt-bar-label {
