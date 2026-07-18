@@ -3106,15 +3106,13 @@ h1, h2, h3, h4, h5, h6 {
   box-sizing: border-box;
 }
 
-/* Sticky Header Timeline with Solid Fill & High Z-Index */
+/* Sticky Header Timeline with Full-Width Extension & Solid Fill */
 .gantt-timeline-header {
   display: flex;
   align-items: center;
   border-bottom: 1px solid var(--border-color);
-  padding-top: 8px !important;
-  padding-bottom: 6px !important;
-  margin-top: -8px !important;
-  margin-bottom: 6px !important;
+  padding: 8px 16px 6px 16px !important;
+  margin: -8px -16px 6px -16px !important;
   position: sticky;
   top: -8px;
   background: var(--bg-secondary) !important;
@@ -3127,7 +3125,7 @@ h1, h2, h3, h4, h5, h6 {
   min-width: 190px !important;
   flex-shrink: 0 !important;
   position: sticky;
-  left: 0;
+  left: -16px;
   background: var(--bg-secondary) !important;
   z-index: 30 !important;
   height: 18px;
@@ -3181,7 +3179,9 @@ h1, h2, h3, h4, h5, h6 {
   flex-direction: column;
   justify-content: center;
   position: sticky;
-  left: 0;
+  left: -16px;
+  margin-left: -16px;
+  padding-left: 16px;
   background: var(--bg-secondary) !important;
   z-index: 15 !important;
 }
