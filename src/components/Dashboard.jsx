@@ -1206,6 +1206,8 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
         isAdmin={true}
         isSystemAdmin={isAdmin}
         token={token}
+        username={username}
+        displayName={displayName}
         onClose={() => {
           setIsMilestoneModalOpen(false);
           setEnquiryForMilestone(null);

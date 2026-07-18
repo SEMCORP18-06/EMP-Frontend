@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import DeleteModal from './DeleteModal';
 import ManageFprsModal from './ManageFprsModal';
 import ConfirmModal from './ConfirmModal';
+import MilestoneRemarksModal from './MilestoneRemarksModal';
 import { API_BASE } from '../config';
 
 const DEFAULT_MILESTONES = [
@@ -63,7 +64,7 @@ const getAvatarColor = (name) => {
   return colors[index];
 };
 
-export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose, onSubmit, enquiry, token }) {
+export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose, onSubmit, enquiry, token, username, displayName }) {
   const [localMilestones, setLocalMilestones] = useState([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [indexToDelete, setIndexToDelete] = useState(null);
@@ -74,6 +75,7 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
   const [isConfirmClientOpen, setIsConfirmClientOpen] = useState(false);
   const [pendingMilestones, setPendingMilestones] = useState(null);
   const [sendClientMailFlag, setSendClientMailFlag] = useState(false);
+  const [activeRemarksMilestoneIdx, setActiveRemarksMilestoneIdx] = useState(null);
 
   const filteredFprs = fprs.filter(fpr => 
     fpr.name.toLowerCase().includes(fprSearchQuery.toLowerCase()) || 
@@ -119,7 +121,24 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
   useEffect(() => {
     if (isOpen && enquiry) {
       if (enquiry.milestones && enquiry.milestones.length > 0) {
-        setLocalMilestones(enquiry.milestones);
+        const normalized = enquiry.milestones.map(m => {
+          let remarksArr = Array.isArray(m.remarks) ? [...m.remarks] : [];
+          if (remarksArr.length === 0 && m.remark && m.remark.trim()) {
+            remarksArr.push({
+              _id: 'rem_legacy_' + Math.random().toString(36).substring(2, 7),
+              text: m.remark.trim(),
+              authorName: m.fpr || 'System',
+              createdBy: 'legacy',
+              createdAt: enquiry.updatedAt || enquiry.createdAt || new Date().toISOString(),
+              updatedAt: enquiry.updatedAt || enquiry.createdAt || new Date().toISOString()
+            });
+          }
+          return {
+            ...m,
+            remarks: remarksArr
+          };
+        });
+        setLocalMilestones(normalized);
       } else {
         const defaults = DEFAULT_MILESTONES.map(name => ({
           name,
@@ -128,7 +147,9 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
           endDate: '',
           actualEndDate: '',
           status: 'Pending',
-          remark: ''
+          remark: '',
+          remarks: [],
+          percentage: 0
         }));
         setLocalMilestones(defaults);
       }
@@ -158,7 +179,9 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
       endDate: new Date().toISOString().split('T')[0],
       actualEndDate: '',
       status: 'Pending',
-      remark: ''
+      remark: '',
+      remarks: [],
+      percentage: 0
     });
     setLocalMilestones(updated);
   };
@@ -191,7 +214,9 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
         endDate: new Date().toISOString().split('T')[0],
         actualEndDate: '',
         status: 'Pending',
-        remark: ''
+        remark: '',
+        remarks: [],
+        percentage: 0
       }
     ]);
   };
@@ -267,7 +292,8 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
       endDate: m.endDate || '',
       actualEndDate: m.actualEndDate || '',
       status: m.status || 'Pending',
-      remark: m.remark ? m.remark.trim() : '',
+      remark: (m.remarks && m.remarks.length > 0) ? m.remarks[m.remarks.length - 1].text : (m.remark || ''),
+      remarks: m.remarks || [],
       percentage: Number(m.percentage) || 0
     }));
 
@@ -574,14 +600,14 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
                                 <option value="Completed">Completed</option>
                               </select>
                             </td>
-                            <td className="col-remark">
-                              <input
-                                type="text"
-                                className="form-input table-input"
-                                value={m.remark}
-                                onChange={(e) => handleFieldChange(idx, 'remark', e.target.value)}
-                                placeholder="Remarks..."
-                              />
+                            <td className="col-remark" style={{ textAlign: 'center' }}>
+                              <button
+                                type="button"
+                                className={`remarks-trigger-btn ${m.remarks && m.remarks.length > 0 ? 'has-remarks' : ''}`}
+                                onClick={() => setActiveRemarksMilestoneIdx(idx)}
+                              >
+                                💬 Remarks ({m.remarks ? m.remarks.length : 0})
+                              </button>
                             </td>
                             <td>
                               <input
@@ -597,7 +623,7 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
                             </td>
                             <td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
                               <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
-                                 <button
+                                  <button
                                     type="button"
                                     className="action-btn insert-btn"
                                     onClick={() => handleInsertRowBelow(idx)}
@@ -628,7 +654,15 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
                                 {m.status}
                               </span>
                             </td>
-                            <td className="col-remark" style={{ fontSize: '0.88rem' }}>{m.remark || '-'}</td>
+                            <td className="col-remark" style={{ textAlign: 'center' }}>
+                              <button
+                                type="button"
+                                className={`remarks-trigger-btn ${m.remarks && m.remarks.length > 0 ? 'has-remarks' : ''}`}
+                                onClick={() => setActiveRemarksMilestoneIdx(idx)}
+                              >
+                                💬 Remarks ({m.remarks ? m.remarks.length : 0})
+                              </button>
+                            </td>
                             <td style={{ textAlign: 'center', fontWeight: 'bold', color: 'var(--accent-primary)', fontSize: '0.85rem' }}>
                               {m.percentage || 0}%
                             </td>
@@ -678,6 +712,26 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
         onConfirm={handleConfirmClientEmail}
         onClose={handleCancelClientEmail}
       />
+      {activeRemarksMilestoneIdx !== null && localMilestones[activeRemarksMilestoneIdx] && (
+        <MilestoneRemarksModal
+          isOpen={activeRemarksMilestoneIdx !== null}
+          onClose={() => setActiveRemarksMilestoneIdx(null)}
+          milestoneName={localMilestones[activeRemarksMilestoneIdx].name}
+          poNumber={enquiry?.poNumber}
+          remarks={localMilestones[activeRemarksMilestoneIdx].remarks || []}
+          onSaveRemarks={(updatedRemarks) => {
+            const updated = [...localMilestones];
+            updated[activeRemarksMilestoneIdx] = {
+              ...updated[activeRemarksMilestoneIdx],
+              remarks: updatedRemarks,
+              remark: updatedRemarks.length > 0 ? updatedRemarks[updatedRemarks.length - 1].text : ''
+            };
+            setLocalMilestones(updated);
+          }}
+          currentUsername={username}
+          currentDisplayName={displayName}
+        />
+      )}
     </div>
   );
 }
