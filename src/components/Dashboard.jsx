@@ -6,7 +6,6 @@ import MilestoneModal from './MilestoneModal';
 import BinModal from './BinModal';
 import DashboardAnalytics from './DashboardAnalytics';
 import UserManagementPanel from './UserManagementPanel';
-import GanttModal from './GanttModal';
 import SendMailModal from './SendMailModal';
 import { API_BASE } from '../config';
 
@@ -355,10 +354,6 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
   // Milestone Modal state
   const [isMilestoneModalOpen, setIsMilestoneModalOpen] = useState(false);
   const [enquiryForMilestone, setEnquiryForMilestone] = useState(null);
-
-  // Gantt Modal state
-  const [isGanttModalOpen, setIsGanttModalOpen] = useState(false);
-  const [enquiryForGantt, setEnquiryForGantt] = useState(null);
 
   // Custom Send Mail Modal state
   const [isSendMailModalOpen, setIsSendMailModalOpen] = useState(false);
@@ -1146,20 +1141,6 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                   >
                                     Add / Modify Milestone
                                   </button>
-                                  <button 
-                                    className="action-btn gantt-btn"
-                                    onClick={() => {
-                                      setEnquiryForGantt(enq);
-                                      setIsGanttModalOpen(true);
-                                    }}
-                                    style={{
-                                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                                      boxShadow: '0 2px 6px rgba(16, 185, 129, 0.2)',
-                                      color: '#ffffff'
-                                    }}
-                                  >
-                                    📊 Gantt Chart
-                                  </button>
                                 </div>
                               )}
                             </div>
@@ -1214,16 +1195,6 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
         }}
         onSubmit={handleMilestoneSubmit}
         enquiry={enquiryForMilestone}
-      />
-
-      <GanttModal
-        isOpen={isGanttModalOpen}
-        onClose={() => {
-          setIsGanttModalOpen(false);
-          setEnquiryForGantt(null);
-        }}
-        enquiry={enquiryForGantt}
-        showSuccessToast={showSuccessToast}
       />
 
       {/* Recycle Bin Modal */}
