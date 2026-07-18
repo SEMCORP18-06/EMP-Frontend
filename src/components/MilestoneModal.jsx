@@ -680,11 +680,9 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
             <button className="btn btn-secondary" type="button" onClick={onClose}>
               Close
             </button>
-            {isAdmin && (
-              <button className="btn btn-primary" type="submit">
-                Save
-              </button>
-            )}
+            <button className="btn btn-primary" type="submit">
+              Save Milestones
+            </button>
           </div>
         </form>
       </div>
@@ -721,12 +719,28 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
           remarks={localMilestones[activeRemarksMilestoneIdx].remarks || []}
           onSaveRemarks={(updatedRemarks) => {
             const updated = [...localMilestones];
+            const lastRemarkText = updatedRemarks.length > 0 ? updatedRemarks[updatedRemarks.length - 1].text : '';
             updated[activeRemarksMilestoneIdx] = {
               ...updated[activeRemarksMilestoneIdx],
               remarks: updatedRemarks,
-              remark: updatedRemarks.length > 0 ? updatedRemarks[updatedRemarks.length - 1].text : ''
+              remark: lastRemarkText
             };
             setLocalMilestones(updated);
+
+            // Auto-persist updated remarks immediately to backend so they are never lost on refresh
+            const mappedMilestones = updated.map(m => ({
+              name: m.name.trim(),
+              fpr: m.fpr ? m.fpr.trim() : '',
+              startDate: m.startDate || '',
+              endDate: m.endDate || '',
+              actualEndDate: m.actualEndDate || '',
+              status: m.status || 'Pending',
+              remark: (m.remarks && m.remarks.length > 0) ? m.remarks[m.remarks.length - 1].text : (m.remark || ''),
+              remarks: m.remarks || [],
+              percentage: Number(m.percentage) || 0
+            }));
+
+            onSubmit(mappedMilestones, false, false);
           }}
           currentUsername={username}
           currentDisplayName={displayName}
