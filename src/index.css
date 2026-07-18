@@ -3022,40 +3022,40 @@ h1, h2, h3, h4, h5, h6 {
   box-sizing: border-box !important;
 }
 
-/* Summary Grid - Ultra-Compact Sleek Header */
+/* Summary Grid - Compact Sleek Header */
 .gantt-summary-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 6px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
   flex-shrink: 0;
 }
 
 .gantt-summary-grid .summary-card {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 4px 8px;
+  border-radius: 8px;
+  padding: 6px 12px;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
 .gantt-summary-grid .summary-card-label {
-  font-size: 0.62rem !important;
+  font-size: 0.68rem !important;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text-secondary);
-  margin-bottom: 1px;
+  margin-bottom: 2px;
 }
 
 .gantt-summary-grid .summary-card-value {
-  font-size: 0.78rem !important;
+  font-size: 0.85rem !important;
   font-weight: 700;
   color: var(--text-primary);
   font-family: var(--font-display);
   word-break: break-all;
-  line-height: 1.1;
+  line-height: 1.35;
 }
 
 .progress-summary-card {
