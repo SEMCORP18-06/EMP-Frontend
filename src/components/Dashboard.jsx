@@ -513,7 +513,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
   };
 
   // Add Milestone Submission
-  const handleMilestoneSubmit = async (updatedMilestones, sendClientEmail, sendFprEmail) => {
+  const handleMilestoneSubmit = async (updatedMilestones, sendClientEmail, sendFprEmail, shouldCloseModal = true) => {
     if (!enquiryForMilestone) return;
     setLoading(true);
 
@@ -534,22 +534,27 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
       }
 
       await fetchEnquiries();
-      setIsMilestoneModalOpen(false);
-      
-      let successMsg = 'Milestones updated successfully!';
-      if (sendClientEmail && sendFprEmail) {
-        successMsg = 'Milestones saved & emails sent to client & FPR successfully!';
-      } else if (sendClientEmail) {
-        successMsg = 'Milestones saved & client email sent successfully!';
-      } else if (sendFprEmail) {
-        successMsg = 'Milestones saved & FPR email sent successfully!';
+
+      if (shouldCloseModal) {
+        setIsMilestoneModalOpen(false);
+        setEnquiryForMilestone(null);
+        
+        let successMsg = 'Milestones updated successfully!';
+        if (sendClientEmail && sendFprEmail) {
+          successMsg = 'Milestones saved & emails sent to client & FPR successfully!';
+        } else if (sendClientEmail) {
+          successMsg = 'Milestones saved & client email sent successfully!';
+        } else if (sendFprEmail) {
+          successMsg = 'Milestones saved & FPR email sent successfully!';
+        }
+        showSuccessToast(successMsg);
+      } else {
+        setEnquiryForMilestone(data);
       }
-      showSuccessToast(successMsg);
     } catch (err) {
       alert(err.message || 'Failed to save milestones');
     } finally {
       setLoading(false);
-      setEnquiryForMilestone(null);
     }
   };
 

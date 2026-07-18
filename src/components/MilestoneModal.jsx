@@ -740,7 +740,10 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
               percentage: Number(m.percentage) || 0
             }));
 
-            onSubmit(mappedMilestones, false, false);
+            // Close ONLY the remarks popup
+            setActiveRemarksMilestoneIdx(null);
+
+            onSubmit(mappedMilestones, false, false, false);
           }}
           currentUsername={username}
           currentDisplayName={displayName}

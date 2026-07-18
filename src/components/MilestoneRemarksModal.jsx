@@ -92,6 +92,7 @@ export default function MilestoneRemarksModal({
     const updated = [...remarks, newRemark];
     onSaveRemarks(updated);
     setNewRemarkText('');
+    onClose();
   };
 
   const handleStartEdit = (remark) => {
