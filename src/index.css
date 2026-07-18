@@ -2997,61 +2997,70 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 6px !important;
 }
 
-/* ─── Gantt Chart Modal Styles ─── */
+/* ─── Gantt Chart Modal Styles (Compact Header & 75% Area) ─── */
 .gantt-modal-overlay {
   z-index: 1200; /* above milestone modals */
 }
 
 .gantt-modal-content {
-  max-width: 90vw !important;
-  width: 1200px !important;
+  max-width: 96vw !important;
+  width: 1420px !important;
+  height: 90vh !important;
+  max-height: 94vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
 }
 
 .gantt-modal-body {
-  padding: 24px !important;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  overflow-y: auto;
+  padding: 14px 18px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  flex: 1 !important;
+  overflow-y: auto !important;
+  box-sizing: border-box !important;
 }
 
-/* Summary Grid */
+/* Summary Grid - Ultra-Compact Sleek Header */
 .gantt-summary-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .gantt-summary-grid .summary-card {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 14px 18px;
+  border-radius: 8px;
+  padding: 5px 10px;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
 .gantt-summary-grid .summary-card-label {
-  font-size: 0.78rem;
+  font-size: 0.65rem !important;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   color: var(--text-secondary);
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .gantt-summary-grid .summary-card-value {
-  font-size: 1.05rem;
+  font-size: 0.82rem !important;
   font-weight: 700;
   color: var(--text-primary);
   font-family: var(--font-display);
   word-break: break-all;
+  line-height: 1.2;
 }
 
 .progress-summary-card {
   border-color: rgba(99, 102, 241, 0.2) !important;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.05);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.04);
 }
 
 .gantt-progress-bar-bg {
@@ -3059,7 +3068,7 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--bg-tertiary);
   border: 1px solid var(--border-color);
   border-radius: 6px;
-  height: 8px;
+  height: 6px;
   overflow: hidden;
 }
 
@@ -3080,39 +3089,55 @@ h1, h2, h3, h4, h5, h6 {
   margin: 12px 0;
 }
 
-/* Gantt Timeline & Layout */
+/* Gantt Timeline & Layout - Dedicated 75% Popup Area Allocation */
 .gantt-chart-container {
   display: flex;
   flex-direction: column;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 16px 20px 24px 20px;
+  border-radius: 14px;
+  padding: 14px 18px 20px 18px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
-  overflow-x: auto;
+  flex: 1 1 75% !important;
+  height: 75% !important;
+  min-height: 68% !important;
+  overflow-y: auto !important;
+  overflow-x: auto !important;
+  box-sizing: border-box;
 }
 
+/* Sticky Header Timeline */
 .gantt-timeline-header {
   display: flex;
   border-bottom: 1px solid var(--border-color);
-  padding-bottom: 10px;
-  margin-bottom: 12px;
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+  position: sticky;
+  top: 0;
+  background: var(--bg-secondary);
+  z-index: 20;
 }
 
 .gantt-sidebar-placeholder {
-  width: 280px;
-  flex-shrink: 0;
+  width: 25% !important;
+  min-width: 190px !important;
+  flex-shrink: 0 !important;
+  position: sticky;
+  left: 0;
+  background: var(--bg-secondary);
+  z-index: 15;
 }
 
 .gantt-timeline-track-header {
   position: relative;
-  flex-grow: 1;
-  height: 24px;
+  width: 75% !important;
+  flex-grow: 1 !important;
+  height: 22px;
 }
 
 .gantt-grid-label {
   position: absolute;
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   font-weight: 600;
   color: var(--text-secondary);
   white-space: nowrap;
@@ -3121,13 +3146,15 @@ h1, h2, h3, h4, h5, h6 {
 .gantt-chart-body {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+  padding-top: 4px;
+  padding-bottom: 8px;
 }
 
 .gantt-row {
   display: flex;
   align-items: center;
-  padding: 6px 0;
+  padding: 4px 0;
   border-radius: 8px;
   transition: var(--transition-smooth);
 }
@@ -3137,16 +3164,21 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .gantt-row-sidebar {
-  width: 280px;
-  flex-shrink: 0;
-  padding-right: 16px;
+  width: 25% !important;
+  min-width: 190px !important;
+  flex-shrink: 0 !important;
+  padding-right: 14px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  position: sticky;
+  left: 0;
+  background: var(--bg-secondary);
+  z-index: 12;
 }
 
 .gantt-milestone-title {
-  font-size: 0.92rem;
+  font-size: 0.86rem;
   font-weight: 600;
   color: var(--text-primary);
   white-space: nowrap;
@@ -3156,10 +3188,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .gantt-milestone-meta {
   display: flex;
-  gap: 10px;
-  font-size: 0.72rem;
+  gap: 8px;
+  font-size: 0.7rem;
   color: var(--text-muted);
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .gantt-meta-weight {
@@ -3171,15 +3203,18 @@ h1, h2, h3, h4, h5, h6 {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 140px;
+  max-width: 130px;
 }
 
 .gantt-row-track {
   position: relative;
-  flex-grow: 1;
+  width: 75% !important;
+  flex-grow: 1 !important;
   height: 38px;
   display: flex;
   align-items: center;
+  overflow: hidden;
+  border-radius: 6px;
 }
 
 /* Vertical helper lines */
