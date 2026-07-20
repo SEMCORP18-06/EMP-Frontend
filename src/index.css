@@ -279,7 +279,7 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(11, 15, 25, 0.75);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-color);
-  padding: 16px 40px;
+  padding: 8px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -350,7 +350,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .dashboard-main {
   flex: 1;
-  padding: 16px 28px;
+  padding: 8px 20px 6px 20px;
   max-width: 1750px;
   width: 100%;
   margin: 0 auto;
@@ -360,13 +360,13 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 6px;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 8px;
 }
 
 .dashboard-title {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   color: #fff;
   font-weight: 700;
 }
@@ -375,17 +375,17 @@ h1, h2, h3, h4, h5, h6 {
   background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
   color: #fff;
   border: none;
-  border-radius: 10px;
-  padding: 8px 16px;
+  border-radius: 8px;
+  padding: 6px 12px;
   font-family: var(--font-display);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition-smooth);
   display: flex;
   align-items: center;
   gap: 6px;
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 3px 10px rgba(99, 102, 241, 0.3);
 }
 
 .add-btn:hover {
@@ -398,15 +398,15 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(11, 15, 25, 0.5);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  padding: 10px 18px;
-  margin-bottom: 12px;
+  border-radius: 10px;
+  padding: 6px 14px;
+  margin-bottom: 8px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
 .search-wrapper {
@@ -419,10 +419,11 @@ h1, h2, h3, h4, h5, h6 {
   width: 100%;
   background: rgba(17, 24, 39, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  padding: 10px 16px 10px 40px;
+  border-radius: 8px;
+  padding: 6px 12px 6px 36px;
   color: var(--text-primary);
   outline: none;
+  font-size: 0.85rem;
   transition: var(--transition-smooth);
 }
 
@@ -595,7 +596,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .table-responsive {
   width: 100%;
-  max-height: calc(100vh - 190px);
+  max-height: calc(100vh - 130px);
   overflow: auto;
   padding-bottom: 8px; /* space for scrollbar */
 }
@@ -4992,7 +4993,7 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   .table-responsive {
-    max-height: calc(100vh - 200px);
+    max-height: calc(100vh - 140px);
   }
 
   .action-buttons {
