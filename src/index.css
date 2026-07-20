@@ -4669,13 +4669,13 @@ h1, h2, h3, h4, h5, h6 {
    Breakpoints: 1400 → 1200 → 992 → 768 → 576 → 480 → 360
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ─── Mobile Hamburger Menu Button ─── */
+/* ─── Mobile Hamburger Menu Button (with animated X) ─── */
 .mobile-menu-btn {
   display: none;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 8px;
@@ -4685,6 +4685,8 @@ h1, h2, h3, h4, h5, h6 {
   height: 38px;
   transition: var(--transition-smooth);
   flex-shrink: 0;
+  position: relative;
+  z-index: 102;
 }
 
 .mobile-menu-btn:hover {
@@ -4698,8 +4700,45 @@ h1, h2, h3, h4, h5, h6 {
   height: 2px;
   background: var(--text-primary);
   border-radius: 2px;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
 }
+
+/* Animated hamburger → X when open */
+.mobile-menu-btn.open .hamburger-line:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.mobile-menu-btn.open .hamburger-line:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.mobile-menu-btn.open .hamburger-line:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ─── Mobile Nav Backdrop Overlay ─── */
+.mobile-nav-backdrop {
+  display: none;
+}
+
+/* ─── Action Button Icon + Label System ─── */
+.action-icon {
+  font-size: 0.9em;
+  line-height: 1;
+}
+
+.action-label {
+  font-size: inherit;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
 
 /* ─── Horizontal Scroll Fade Indicator ─── */
 .table-responsive {
@@ -4781,9 +4820,9 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
   }
 
-  /* Navbar collapses behind hamburger */
+  /* Navbar collapses behind hamburger — smooth slide animation */
   .top-navbar {
-    display: none;
+    display: flex;
     position: absolute;
     top: 100%;
     left: 0;
@@ -4791,15 +4830,37 @@ h1, h2, h3, h4, h5, h6 {
     background: var(--bg-primary);
     border-top: 1px solid var(--border-color);
     border-bottom: 1px solid var(--border-color);
-    padding: 8px 12px;
+    padding: 0 12px;
     z-index: 100;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
     flex-direction: column;
     gap: 4px;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.25s ease,
+                padding 0.3s ease;
   }
 
   .top-navbar.nav-open {
-    display: flex;
+    max-height: 300px;
+    opacity: 1;
+    padding: 8px 12px;
+  }
+
+  /* Mobile nav backdrop */
+  .mobile-nav-backdrop {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 99;
+    animation: fadeIn 0.2s ease;
+    backdrop-filter: blur(2px);
   }
 
   .dashboard-header {
@@ -4822,6 +4883,11 @@ h1, h2, h3, h4, h5, h6 {
     text-align: center;
     border-radius: 8px;
     padding: 10px 16px;
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+
+  .nav-link:active {
+    transform: scale(0.97);
   }
 
   .nav-link.active::after {
@@ -4854,6 +4920,10 @@ h1, h2, h3, h4, h5, h6 {
 
 [data-theme="light"] .top-navbar {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .mobile-nav-backdrop {
+  background: rgba(0, 0, 0, 0.25);
 }
 
 /* ════════════════════════════════════════════
@@ -5274,20 +5344,20 @@ h1, h2, h3, h4, h5, h6 {
 
   .action-btn {
     font-size: 0.72rem;
-    padding: 4px 6px;
+    padding: 5px 8px;
     border-radius: 6px;
   }
 
-  .action-btn.add-milestone {
-    font-size: 0.7rem;
-    padding: 4px 6px;
+  .action-label {
+    display: inline;
   }
 
-  /* Modals full-screen */
+  /* Modals full-screen slide-up */
   .modal-overlay {
     padding: 0;
     padding-top: 0;
     align-items: flex-end;
+    animation: fadeIn 0.2s ease-out;
   }
 
   .modal-content {
@@ -5295,6 +5365,7 @@ h1, h2, h3, h4, h5, h6 {
     max-height: 95vh;
     width: 100% !important;
     max-width: 100% !important;
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .modal-content.small {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Spinner from './Spinner';
 import EnquiryModal from './EnquiryModal';
 import DeleteModal from './DeleteModal';
@@ -369,6 +369,23 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
   
   // Mobile navigation toggle
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const headerRef = useRef(null);
+
+  // Close mobile nav when clicking outside
+  useEffect(() => {
+    if (!mobileNavOpen) return;
+    const handleClickOutside = (e) => {
+      if (headerRef.current && !headerRef.current.contains(e.target)) {
+        setMobileNavOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, [mobileNavOpen]);
 
   // Success toast popup state
   const [successToast, setSuccessToast] = useState({ visible: false, message: '' });
@@ -712,13 +729,13 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
       <Spinner active={loading} />
       
       {/* Header */}
-      <header className="dashboard-header">
+      <header className="dashboard-header" ref={headerRef}>
         <div className="logo-capsule" style={{ background: '#ffffff', padding: '6px 12px', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)', display: 'flex', alignItems: 'center' }}>
           <img src="/semco_logo.png" alt="SEMCO Logo" style={{ height: '32px', objectFit: 'contain', display: 'block' }} />
         </div>
 
         <button 
-          className="mobile-menu-btn"
+          className={`mobile-menu-btn ${mobileNavOpen ? 'open' : ''}`}
           onClick={() => setMobileNavOpen(!mobileNavOpen)}
           aria-label="Toggle navigation"
         >
@@ -726,6 +743,9 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
           <span className="hamburger-line"></span>
           <span className="hamburger-line"></span>
         </button>
+
+        {/* Mobile nav backdrop */}
+        {mobileNavOpen && <div className="mobile-nav-backdrop" onClick={() => setMobileNavOpen(false)} />}
 
         {/* Navigation Navbar */}
         <nav className={`top-navbar ${mobileNavOpen ? 'nav-open' : ''}`}>
@@ -1129,21 +1149,25 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                 <>
                                   <button 
                                     className="action-btn modify"
+                                    title="Modify Enquiry"
                                     onClick={() => {
                                       setSelectedEnquiry(enq);
                                       setIsEnquiryModalOpen(true);
                                     }}
                                   >
-                                    Modify
+                                    <span className="action-icon">✏️</span>
+                                    <span className="action-label">Modify</span>
                                   </button>
                                   <button 
                                     className="action-btn delete"
+                                    title="Delete Enquiry"
                                     onClick={() => {
                                       setEnquiryToDelete(enq);
                                       setIsDeleteModalOpen(true);
                                     }}
                                   >
-                                    Delete
+                                    <span className="action-icon">🗑️</span>
+                                    <span className="action-label">Delete</span>
                                   </button>
                                   {enq.currentStatus === 'Confirmed' && (
                                     <button 
@@ -1167,7 +1191,8 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                       setIsMilestoneModalOpen(true);
                                     }}
                                   >
-                                    Add / Modify Milestone
+                                    <span className="action-icon">📋</span>
+                                    <span className="action-label">Milestones</span>
                                   </button>
                                   <button 
                                     className="action-btn gantt-btn"
@@ -1181,7 +1206,8 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                       color: '#ffffff'
                                     }}
                                   >
-                                    📊 Gantt Chart
+                                    <span className="action-icon">📊</span>
+                                    <span className="action-label">Gantt</span>
                                   </button>
                                 </div>
                               )}
