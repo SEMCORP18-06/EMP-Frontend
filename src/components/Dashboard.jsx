@@ -367,6 +367,9 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
   // Recycle Bin Modal state
   const [isBinModalOpen, setIsBinModalOpen] = useState(false);
   
+  // Mobile navigation toggle
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
   // Success toast popup state
   const [successToast, setSuccessToast] = useState({ visible: false, message: '' });
 
@@ -714,8 +717,18 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
           <img src="/semco_logo.png" alt="SEMCO Logo" style={{ height: '32px', objectFit: 'contain', display: 'block' }} />
         </div>
 
+        <button 
+          className="mobile-menu-btn"
+          onClick={() => setMobileNavOpen(!mobileNavOpen)}
+          aria-label="Toggle navigation"
+        >
+          <span className="hamburger-line"></span>
+          <span className="hamburger-line"></span>
+          <span className="hamburger-line"></span>
+        </button>
+
         {/* Navigation Navbar */}
-        <nav className="top-navbar">
+        <nav className={`top-navbar ${mobileNavOpen ? 'nav-open' : ''}`}>
           <button 
             className={`nav-link ${activeTab === 'enquiries' ? 'active' : ''}`}
             onClick={() => {
@@ -726,6 +739,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
               setEndDateFilter('');
               setShowDateDropdown(false);
               setShowStatusDropdown(false);
+              setMobileNavOpen(false);
             }}
           >
             Enquiries
@@ -740,6 +754,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
               setEndDateFilter('');
               setShowDateDropdown(false);
               setShowStatusDropdown(false);
+              setMobileNavOpen(false);
             }}
           >
             Confirmed Orders
@@ -754,6 +769,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
               setEndDateFilter('');
               setShowDateDropdown(false);
               setShowStatusDropdown(false);
+              setMobileNavOpen(false);
             }}
           >
             Dashboard
@@ -965,16 +981,16 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                           </div>
                         )}
                       </th>
-                      <th>Company Name</th>
+                      <th className="col-company">Company Name</th>
                       <th>Client Name</th>
-                      <th>Country Code</th>
-                      <th>Contact Number</th>
-                      <th>Mail ID</th>
-                      <th>Enq Details</th>
-                      <th>Major Equipments</th>
-                      <th>Source</th>
+                      <th className="col-contact">Country Code</th>
+                      <th className="col-contact">Contact Number</th>
+                      <th className="col-mail">Mail ID</th>
+                      <th className="col-details">Enq Details</th>
+                      <th className="col-equipment">Major Equipments</th>
+                      <th className="col-source">Source</th>
                       <th>FPR</th>
-                      <th>Quotation Number</th>
+                      <th className="col-quotation">Quotation Number</th>
                       <th>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
                           <span>Status</span>
@@ -1039,11 +1055,11 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                           </div>
                         )}
                       </th>
-                      <th>Offter Sub Date</th>
-                      <th>PO Number</th>
-                      <th>Expected Dispatch Date</th>
-                      <th>Project Engineer</th>
-                      <th>Follow-up Comments</th>
+                      <th className="col-offer-date">Offter Sub Date</th>
+                      <th className="col-po">PO Number</th>
+                      <th className="col-dispatch">Expected Dispatch Date</th>
+                      <th className="col-engineer">Project Engineer</th>
+                      <th className="col-comments">Follow-up Comments</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -1051,16 +1067,16 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                     {filteredEnquiries.map((enq) => (
                       <tr key={enq._id}>
                         <td style={{ whiteSpace: 'nowrap' }}>{enq.date}</td>
-                        <td>{enq.companyName}</td>
+                        <td className="col-company">{enq.companyName}</td>
                         <td>{enq.clientName}</td>
-                        <td>{enq.contactCountryCode}</td>
-                        <td>{enq.contactNumber}</td>
-                        <td>
+                        <td className="col-contact">{enq.contactCountryCode}</td>
+                        <td className="col-contact">{enq.contactNumber}</td>
+                        <td className="col-mail">
                           <a href={`mailto:${enq.mailId}`} style={{ color: 'var(--accent-primary)', textDecoration: 'none' }}>
                             {enq.mailId}
                           </a>
                         </td>
-                        <td style={{ minWidth: '180px', maxWidth: '300px', fontSize: '0.88rem' }}>
+                        <td className="col-details" style={{ minWidth: '180px', maxWidth: '300px', fontSize: '0.88rem' }}>
                           <div 
                             className="clamp-2-lines" 
                             onClick={() => setEnqDetailsPopup(enq.enquiryDetails)}
@@ -1069,10 +1085,10 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                             {enq.enquiryDetails}
                           </div>
                         </td>
-                        <td>{enq.majorEquipments}</td>
-                        <td>{enq.enquirySource}</td>
+                        <td className="col-equipment">{enq.majorEquipments}</td>
+                        <td className="col-source">{enq.enquirySource}</td>
                         <td>{enq.fpr || '-'}</td>
-                        <td style={{ fontWeight: '600' }}>{enq.quotationNumber || '-'}</td>
+                        <td className="col-quotation" style={{ fontWeight: '600' }}>{enq.quotationNumber || '-'}</td>
                         <td>
                           {activeTab === 'milestones' ? (
                             <div style={{ minWidth: '100px' }}>
@@ -1102,11 +1118,11 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                             </span>
                           )}
                         </td>
-                        <td style={{ whiteSpace: 'nowrap' }}>{enq.offerSubmittedDate || '-'}</td>
-                        <td>{enq.poNumber || '-'}</td>
-                        <td style={{ whiteSpace: 'nowrap' }}>{enq.expectedDateOfDispatch || '-'}</td>
-                        <td>{enq.projectEngineer || '-'}</td>
-                        <td>{enq.followUpComments || '-'}</td>
+                        <td className="col-offer-date" style={{ whiteSpace: 'nowrap' }}>{enq.offerSubmittedDate || '-'}</td>
+                        <td className="col-po">{enq.poNumber || '-'}</td>
+                        <td className="col-dispatch" style={{ whiteSpace: 'nowrap' }}>{enq.expectedDateOfDispatch || '-'}</td>
+                        <td className="col-engineer">{enq.projectEngineer || '-'}</td>
+                        <td className="col-comments">{enq.followUpComments || '-'}</td>
                           <td>
                             <div className="action-buttons">
                               {activeTab === 'enquiries' ? (
