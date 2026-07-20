@@ -601,10 +601,9 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
                   type="email"
                   id="mailId"
                   name="mailId"
-                  placeholder="client@company.com"
+                  placeholder="client@company.com (optional)"
                   value={formData.mailId}
                   onChange={handleChange}
-                  required
                 />
               </div>
 
