@@ -761,6 +761,11 @@ h1, h2, h3, h4, h5, h6 {
 .action-btn.modify {
   color: var(--accent-primary);
   border-color: rgba(99, 102, 241, 0.2);
+  padding: 5px 9px;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .action-btn.modify:hover {
   background: rgba(99, 102, 241, 0.1);
@@ -770,6 +775,11 @@ h1, h2, h3, h4, h5, h6 {
 .action-btn.delete {
   color: #ef4444;
   border-color: rgba(239, 68, 68, 0.2);
+  padding: 5px 9px;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .action-btn.delete:hover {
   background: rgba(239, 68, 68, 0.1);
@@ -779,7 +789,11 @@ h1, h2, h3, h4, h5, h6 {
 .action-btn.mail-btn {
   color: #38bdf8;
   border-color: rgba(56, 189, 248, 0.25);
-  margin-left: 6px;
+  padding: 5px 9px;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .action-btn.mail-btn:hover {
   background: rgba(56, 189, 248, 0.1);

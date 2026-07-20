@@ -1155,8 +1155,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                       setIsEnquiryModalOpen(true);
                                     }}
                                   >
-                                    <span className="action-icon">✏️</span>
-                                    <span className="action-label">Modify</span>
+                                    ✏️
                                   </button>
                                   <button 
                                     className="action-btn delete"
@@ -1166,8 +1165,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                       setIsDeleteModalOpen(true);
                                     }}
                                   >
-                                    <span className="action-icon">🗑️</span>
-                                    <span className="action-label">Delete</span>
+                                    🗑️
                                   </button>
                                   {enq.currentStatus === 'Confirmed' && (
                                     <button 

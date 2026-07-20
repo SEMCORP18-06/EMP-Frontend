@@ -187,17 +187,21 @@ export default function UserManagementPanel({ token, currentUsername }) {
                             className="action-btn delete"
                             disabled={isUpdating}
                             onClick={() => handleDeleteClick(u)}
+                            title="Delete User"
                             style={{ 
-                              padding: '5px 12px', 
-                              fontSize: '0.8rem', 
+                              padding: '5px 10px', 
+                              fontSize: '0.95rem', 
                               background: 'rgba(239, 68, 68, 0.15)',
                               border: '1px solid rgba(239, 68, 68, 0.3)',
                               color: '#f87171',
                               borderRadius: '6px',
-                              cursor: 'pointer'
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
                             }}
                           >
-                            Delete
+                            🗑️
                           </button>
                         )}
                       </td>
