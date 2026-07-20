@@ -901,7 +901,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                 <table className="custom-table">
                   <thead>
                     <tr>
-                      <th style={{ position: 'relative' }}>
+                      <th>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
                           <span>Enq Date</span>
                           <button 
@@ -975,7 +975,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                       <th>Source</th>
                       <th>FPR</th>
                       <th>Quotation Number</th>
-                      <th style={{ position: 'relative' }}>
+                      <th>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
                           <span>Status</span>
                           {activeTab !== 'milestones' && (
