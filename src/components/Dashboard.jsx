@@ -1190,7 +1190,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                     }}
                                     title="Add or Modify Project Milestones"
                                   >
-                                    Add/Modify Milestones
+                                    📋 Milestones
                                   </button>
                                   <button 
                                     className="action-btn gantt-btn"
@@ -1200,7 +1200,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                     }}
                                     title="View Gantt Chart Timeline"
                                   >
-                                    Gantt Chart
+                                    📊 Gantt
                                   </button>
                                 </div>
                               )}
