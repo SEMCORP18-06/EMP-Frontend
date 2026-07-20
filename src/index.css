@@ -350,8 +350,8 @@ h1, h2, h3, h4, h5, h6 {
 
 .dashboard-main {
   flex: 1;
-  padding: 40px;
-  max-width: 1600px;
+  padding: 16px 28px;
+  max-width: 1750px;
   width: 100%;
   margin: 0 auto;
 }
@@ -360,13 +360,13 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 12px;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 12px;
 }
 
 .dashboard-title {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   color: #fff;
   font-weight: 700;
 }
@@ -375,15 +375,16 @@ h1, h2, h3, h4, h5, h6 {
   background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
   color: #fff;
   border: none;
-  border-radius: 12px;
-  padding: 12px 24px;
+  border-radius: 10px;
+  padding: 8px 16px;
   font-family: var(--font-display);
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition-smooth);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
 }
 
@@ -397,14 +398,14 @@ h1, h2, h3, h4, h5, h6 {
   background: rgba(11, 15, 25, 0.5);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 16px;
-  padding: 16px 24px;
-  margin-bottom: 24px;
+  border-radius: 12px;
+  padding: 10px 18px;
+  margin-bottom: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
@@ -594,7 +595,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .table-responsive {
   width: 100%;
-  max-height: calc(100vh - 240px);
+  max-height: calc(100vh - 165px);
   overflow: auto;
   padding-bottom: 8px; /* space for scrollbar */
 }
@@ -639,7 +640,7 @@ h1, h2, h3, h4, h5, h6 {
   border-collapse: separate;
   border-spacing: 0;
   text-align: center;
-  font-size: 0.92rem;
+  font-size: 0.84rem;
 }
 
 .custom-table th {
@@ -648,8 +649,9 @@ h1, h2, h3, h4, h5, h6 {
   z-index: 25;
   background: #111827;
   color: var(--text-secondary);
-  padding: 18px 24px;
+  padding: 10px 14px;
   font-family: var(--font-display);
+  font-size: 0.82rem;
   font-weight: 600;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
   white-space: nowrap;
@@ -664,9 +666,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .custom-table td {
-  padding: 16px 24px;
+  padding: 7px 12px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   color: var(--text-primary);
+  font-size: 0.84rem;
 }
 
 .custom-table tr {
