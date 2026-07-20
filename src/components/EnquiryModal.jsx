@@ -96,6 +96,7 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
   const [equipSearchQuery, setEquipSearchQuery] = useState('');
   const [pastEnquiriesList, setPastEnquiriesList] = useState([]);
   const [isClientSuggestionsOpen, setIsClientSuggestionsOpen] = useState(false);
+  const [isCompanySuggestionsOpen, setIsCompanySuggestionsOpen] = useState(false);
 
   const filteredEquipments = equipments.filter(eq => 
     eq.name.toLowerCase().includes(equipSearchQuery.toLowerCase())
@@ -235,6 +236,47 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
     setIsClientSuggestionsOpen(false);
   };
 
+  const pastCompanies = useMemo(() => {
+    if (!allEnquiries || !Array.isArray(allEnquiries)) return [];
+    const companyMap = new Map();
+    allEnquiries.forEach(enq => {
+      if (enq.companyName && enq.companyName.trim()) {
+        const key = enq.companyName.trim().toLowerCase();
+        if (!companyMap.has(key)) {
+          companyMap.set(key, {
+            companyName: enq.companyName.trim(),
+            clientName: enq.clientName ? enq.clientName.trim() : '',
+            mailId: enq.mailId ? enq.mailId.trim() : '',
+            contactCountryCode: enq.contactCountryCode || '+91',
+            contactNumber: enq.contactNumber ? enq.contactNumber.trim() : ''
+          });
+        }
+      }
+    });
+    return Array.from(companyMap.values());
+  }, [allEnquiries]);
+
+  const matchingCompanies = useMemo(() => {
+    const query = (formData.companyName || '').trim().toLowerCase();
+    if (!query) return [];
+    return pastCompanies.filter(c => 
+      c.companyName.toLowerCase().includes(query) || 
+      (c.clientName && c.clientName.toLowerCase().includes(query))
+    );
+  }, [pastCompanies, formData.companyName]);
+
+  const handleSelectCompanySuggestion = (c) => {
+    setFormData(prev => ({
+      ...prev,
+      companyName: c.companyName,
+      clientName: c.clientName || prev.clientName,
+      mailId: c.mailId || prev.mailId,
+      contactCountryCode: c.contactCountryCode || prev.contactCountryCode || '+91',
+      contactNumber: c.contactNumber || prev.contactNumber
+    }));
+    setIsCompanySuggestionsOpen(false);
+  };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       const insideEquip = event.target.closest('.equip-dropdown-container');
@@ -255,6 +297,10 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
       const insideClient = event.target.closest('.client-autocomplete-container');
       if (!insideClient) {
         setIsClientSuggestionsOpen(false);
+      }
+      const insideCompany = event.target.closest('.company-autocomplete-container');
+      if (!insideCompany) {
+        setIsCompanySuggestionsOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -428,19 +474,49 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
                 />
               </div>
 
-              {/* 2. Company Name */}
-              <div className="form-group">
+              {/* 2. Company Name with Auto-Complete */}
+              <div className="form-group company-autocomplete-container" style={{ position: 'relative' }}>
                 <label className="form-label" htmlFor="companyName">Company Name</label>
                 <input
                   className="form-input"
                   type="text"
                   id="companyName"
                   name="companyName"
-                  placeholder="Enter company name"
+                  placeholder="Enter or search company name..."
                   value={formData.companyName}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    handleChange(e);
+                    setIsCompanySuggestionsOpen(true);
+                  }}
+                  onFocus={() => setIsCompanySuggestionsOpen(true)}
+                  autoComplete="off"
                   required
                 />
+
+                {isCompanySuggestionsOpen && matchingCompanies.length > 0 && (
+                  <div className="client-suggestions-dropdown">
+                    <div className="suggestion-header">
+                      <span>Past Companies Database ({matchingCompanies.length})</span>
+                      <span className="suggestion-hint">Click to auto-fill Client, Email & Phone</span>
+                    </div>
+                    {matchingCompanies.map((c, idx) => (
+                      <div 
+                        key={idx} 
+                        className="suggestion-item"
+                        onClick={() => handleSelectCompanySuggestion(c)}
+                      >
+                        <div className="suggestion-item-main">
+                          <span className="suggestion-company-name" style={{ fontWeight: 700, color: 'var(--text-primary)' }}>🏢 {c.companyName}</span>
+                          {c.clientName && <span className="suggestion-client-name" style={{ fontWeight: 500, color: 'var(--text-secondary)' }}>👤 {c.clientName}</span>}
+                        </div>
+                        <div className="suggestion-item-details">
+                          {c.mailId && <span className="suggestion-detail">✉️ {c.mailId}</span>}
+                          {c.contactNumber && <span className="suggestion-detail">📞 {c.contactCountryCode || '+91'} {c.contactNumber}</span>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* 3. Client Name with Auto-Complete & Contact Auto-Fill */}
