@@ -4760,10 +4760,6 @@ h1, h2, h3, h4, h5, h6 {
    BREAKPOINT: ≤ 1400px (Small Desktop / Large Laptop)
    ════════════════════════════════════════════ */
 @media (max-width: 1400px) {
-  .col-comments {
-    display: none !important;
-  }
-
   .dashboard-main {
     max-width: 100%;
   }
@@ -4773,11 +4769,6 @@ h1, h2, h3, h4, h5, h6 {
    BREAKPOINT: ≤ 1200px (Standard Laptop)
    ════════════════════════════════════════════ */
 @media (max-width: 1200px) {
-  .col-source,
-  .col-comments {
-    display: none !important;
-  }
-
   .col-details {
     max-width: 150px !important;
     min-width: 120px !important;
@@ -4788,15 +4779,6 @@ h1, h2, h3, h4, h5, h6 {
    BREAKPOINT: ≤ 992px (Tablet Landscape / Small Laptop)
    ════════════════════════════════════════════ */
 @media (max-width: 992px) {
-  /* Hide more columns */
-  .col-source,
-  .col-comments,
-  .col-equipment,
-  .col-contact,
-  .col-mail {
-    display: none !important;
-  }
-
   /* Show hamburger button */
   .mobile-menu-btn {
     display: flex;
@@ -4907,19 +4889,6 @@ h1, h2, h3, h4, h5, h6 {
    BREAKPOINT: ≤ 768px (Tablet Portrait / Phablet)
    ════════════════════════════════════════════ */
 @media (max-width: 768px) {
-  /* Hide even more columns */
-  .col-source,
-  .col-comments,
-  .col-equipment,
-  .col-contact,
-  .col-mail,
-  .col-offer-date,
-  .col-dispatch,
-  .col-engineer,
-  .col-details {
-    display: none !important;
-  }
-
   /* Header compact */
   .dashboard-header {
     padding: 8px 12px;
@@ -5192,22 +5161,6 @@ h1, h2, h3, h4, h5, h6 {
    BREAKPOINT: ≤ 576px (Mobile Phone)
    ════════════════════════════════════════════ */
 @media (max-width: 576px) {
-  /* Hide all non-essential columns */
-  .col-source,
-  .col-comments,
-  .col-equipment,
-  .col-contact,
-  .col-mail,
-  .col-offer-date,
-  .col-dispatch,
-  .col-engineer,
-  .col-details,
-  .col-po,
-  .col-quotation,
-  .col-company {
-    display: none !important;
-  }
-
   /* Header ultra-compact */
   .dashboard-header {
     padding: 6px 10px;
