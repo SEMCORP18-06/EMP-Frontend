@@ -285,7 +285,7 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 1000;
 }
 
 .dashboard-logo {
@@ -4269,25 +4269,6 @@ h1, h2, h3, h4, h5, h6 {
   color: #64748b;
 }
 
-/* Sticky Table Headers below Sticky Navbar (Desktop-only) */
-@media (min-width: 1025px) {
-  .dashboard-container {
-    height: 100vh;
-    overflow: hidden;
-  }
-  .dashboard-main {
-    overflow-y: auto;
-  }
-  .custom-table th {
-    position: sticky;
-    top: 0; /* Sticks right below the sticky dashboard-header since dashboard-main starts below header */
-    z-index: 98;
-    background: var(--bg-tertiary) !important;
-  }
-  [data-theme="light"] .custom-table th {
-    background: #dde4f4 !important;
-  }
-}
 
 /* ─── Milestone Remarks Trigger Button & Chat Popup ─── */
 .remarks-trigger-btn {
@@ -4745,19 +4726,6 @@ h1, h2, h3, h4, h5, h6 {
   position: relative;
 }
 
-.table-responsive::after {
-  content: '';
-  position: sticky;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 30px;
-  pointer-events: none;
-  background: linear-gradient(to left, rgba(0,0,0,0.15), transparent);
-  display: none;
-  z-index: 10;
-}
-
 /* ─── Column Visibility Classes (base: always visible) ─── */
 .col-company,
 .col-contact,
@@ -4897,11 +4865,6 @@ h1, h2, h3, h4, h5, h6 {
   .nav-link.active {
     background: var(--accent-primary);
     color: #ffffff;
-  }
-
-  /* Table card - show scroll hint */
-  .table-responsive::after {
-    display: block;
   }
 
   /* Gantt modal */
