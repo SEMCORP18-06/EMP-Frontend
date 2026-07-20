@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import ManageEquipmentsModal from './ManageEquipmentsModal';
 import ManageFprsModal from './ManageFprsModal';
 import ManageProjectEngineersModal from './ManageProjectEngineersModal';
@@ -86,7 +86,7 @@ const INITIAL_STATE = {
   followUpComments: ''
 };
 
-export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdmin, token }) {
+export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdmin, token, enquiries = [] }) {
   const [formData, setFormData] = useState(INITIAL_STATE);
   const [isEquipDropdownOpen, setIsEquipDropdownOpen] = useState(false);
   const [isFprDropdownOpen, setIsFprDropdownOpen] = useState(false);
@@ -94,6 +94,8 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
   const [equipments, setEquipments] = useState([]);
   const [isManageModalOpen, setIsManageModalOpen] = useState(false);
   const [equipSearchQuery, setEquipSearchQuery] = useState('');
+  const [pastEnquiriesList, setPastEnquiriesList] = useState([]);
+  const [isClientSuggestionsOpen, setIsClientSuggestionsOpen] = useState(false);
 
   const filteredEquipments = equipments.filter(eq => 
     eq.name.toLowerCase().includes(equipSearchQuery.toLowerCase())
@@ -116,6 +118,22 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
     pe.name.toLowerCase().includes(peSearchQuery.toLowerCase()) ||
     (pe.email && pe.email.toLowerCase().includes(peSearchQuery.toLowerCase()))
   );
+
+  const fetchPastEnquiries = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_BASE}/enquiries`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!res.ok) throw new Error('Failed to fetch enquiries');
+      const data = await res.json();
+      setPastEnquiriesList(data);
+    } catch (err) {
+      console.error('Error fetching past enquiries:', err);
+    }
+  };
 
   const fetchFprs = async () => {
     if (!token) return;
@@ -170,8 +188,52 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
       fetchEquipments();
       fetchFprs();
       fetchProjectEngineers();
+      fetchPastEnquiries();
     }
   }, [isOpen, token]);
+
+  const allEnquiries = (enquiries && enquiries.length > 0) ? enquiries : pastEnquiriesList;
+
+  const pastClients = useMemo(() => {
+    if (!allEnquiries || !Array.isArray(allEnquiries)) return [];
+    const clientMap = new Map();
+    allEnquiries.forEach(enq => {
+      if (enq.clientName && enq.clientName.trim()) {
+        const key = enq.clientName.trim().toLowerCase();
+        if (!clientMap.has(key)) {
+          clientMap.set(key, {
+            clientName: enq.clientName.trim(),
+            companyName: enq.companyName ? enq.companyName.trim() : '',
+            mailId: enq.mailId ? enq.mailId.trim() : '',
+            contactCountryCode: enq.contactCountryCode || '+91',
+            contactNumber: enq.contactNumber ? enq.contactNumber.trim() : ''
+          });
+        }
+      }
+    });
+    return Array.from(clientMap.values());
+  }, [allEnquiries]);
+
+  const matchingClients = useMemo(() => {
+    const query = (formData.clientName || '').trim().toLowerCase();
+    if (!query) return [];
+    return pastClients.filter(c => 
+      c.clientName.toLowerCase().includes(query) || 
+      (c.companyName && c.companyName.toLowerCase().includes(query))
+    );
+  }, [pastClients, formData.clientName]);
+
+  const handleSelectClientSuggestion = (c) => {
+    setFormData(prev => ({
+      ...prev,
+      clientName: c.clientName,
+      companyName: c.companyName || prev.companyName,
+      mailId: c.mailId || prev.mailId,
+      contactCountryCode: c.contactCountryCode || prev.contactCountryCode || '+91',
+      contactNumber: c.contactNumber || prev.contactNumber
+    }));
+    setIsClientSuggestionsOpen(false);
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -189,6 +251,10 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
       if (!insidePe) {
         setIsPeDropdownOpen(false);
         setPeSearchQuery('');
+      }
+      const insideClient = event.target.closest('.client-autocomplete-container');
+      if (!insideClient) {
+        setIsClientSuggestionsOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -377,19 +443,49 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
                 />
               </div>
 
-              {/* 3. Client Name */}
-              <div className="form-group">
+              {/* 3. Client Name with Auto-Complete & Contact Auto-Fill */}
+              <div className="form-group client-autocomplete-container" style={{ position: 'relative' }}>
                 <label className="form-label" htmlFor="clientName">Client Name</label>
                 <input
                   className="form-input"
                   type="text"
                   id="clientName"
                   name="clientName"
-                  placeholder="Enter client name"
+                  placeholder="Enter or search client name..."
                   value={formData.clientName}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    handleChange(e);
+                    setIsClientSuggestionsOpen(true);
+                  }}
+                  onFocus={() => setIsClientSuggestionsOpen(true)}
+                  autoComplete="off"
                   required
                 />
+
+                {isClientSuggestionsOpen && matchingClients.length > 0 && (
+                  <div className="client-suggestions-dropdown">
+                    <div className="suggestion-header">
+                      <span>Past Clients Database ({matchingClients.length})</span>
+                      <span className="suggestion-hint">Click to auto-fill Email & Phone</span>
+                    </div>
+                    {matchingClients.map((c, idx) => (
+                      <div 
+                        key={idx} 
+                        className="suggestion-item"
+                        onClick={() => handleSelectClientSuggestion(c)}
+                      >
+                        <div className="suggestion-item-main">
+                          <span className="suggestion-client-name">👤 {c.clientName}</span>
+                          {c.companyName && <span className="suggestion-company-name">🏢 {c.companyName}</span>}
+                        </div>
+                        <div className="suggestion-item-details">
+                          {c.mailId && <span className="suggestion-detail">✉️ {c.mailId}</span>}
+                          {c.contactNumber && <span className="suggestion-detail">📞 {c.contactCountryCode || '+91'} {c.contactNumber}</span>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* 4. Country Code & Contact Number */}

@@ -4569,4 +4569,83 @@ h1, h2, h3, h4, h5, h6 {
   cursor: not-allowed;
 }
 
+/* ─── Client Name Autocomplete & Contact Auto-Fill Dropdown ─── */
+.client-suggestions-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1050;
+  margin-top: 4px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.client-suggestions-dropdown .suggestion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.client-suggestions-dropdown .suggestion-hint {
+  font-size: 0.65rem;
+  color: var(--accent-primary);
+  text-transform: none;
+  font-weight: 500;
+}
+
+.client-suggestions-dropdown .suggestion-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-color);
+  transition: background 0.15s ease;
+}
+
+.client-suggestions-dropdown .suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.client-suggestions-dropdown .suggestion-item:hover {
+  background: var(--accent-glow);
+}
+
+.client-suggestions-dropdown .suggestion-item-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.client-suggestions-dropdown .suggestion-client-name {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.client-suggestions-dropdown .suggestion-company-name {
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.client-suggestions-dropdown .suggestion-item-details {
+  display: flex;
+  gap: 12px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+
 

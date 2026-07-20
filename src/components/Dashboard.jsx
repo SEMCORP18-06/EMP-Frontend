@@ -1196,6 +1196,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
         enquiry={selectedEnquiry}
         isAdmin={isAdmin}
         token={token}
+        enquiries={enquiries}
       />
 
       {/* Deletion Warning Modal */}
