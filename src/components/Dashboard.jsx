@@ -1181,16 +1181,16 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                   )}
                                 </>
                               ) : (
-                                <div style={{ display: 'flex', gap: '8px' }}>
+                                <div className="confirmed-action-buttons">
                                   <button 
                                     className="action-btn add-milestone"
                                     onClick={() => {
                                       setEnquiryForMilestone(enq);
                                       setIsMilestoneModalOpen(true);
                                     }}
+                                    title="Add or Modify Project Milestones"
                                   >
-                                    <span className="action-icon">📋</span>
-                                    <span className="action-label">Milestones</span>
+                                    Add/Modify Milestones
                                   </button>
                                   <button 
                                     className="action-btn gantt-btn"
@@ -1198,14 +1198,9 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                       setEnquiryForGantt(enq);
                                       setIsGanttModalOpen(true);
                                     }}
-                                    style={{
-                                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                                      boxShadow: '0 2px 6px rgba(16, 185, 129, 0.2)',
-                                      color: '#ffffff'
-                                    }}
+                                    title="View Gantt Chart Timeline"
                                   >
-                                    <span className="action-icon">📊</span>
-                                    <span className="action-label">Gantt</span>
+                                    Gantt Chart
                                   </button>
                                 </div>
                               )}
