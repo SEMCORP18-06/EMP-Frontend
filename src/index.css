@@ -213,6 +213,12 @@ h1, h2, h3, h4, h5, h6 {
   text-transform: uppercase;
 }
 
+.required-asterisk {
+  color: #ef4444;
+  margin-left: 3px;
+  font-weight: 700;
+}
+
 .form-input {
   background: rgba(17, 24, 39, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.08);

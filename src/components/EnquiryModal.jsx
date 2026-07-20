@@ -462,7 +462,7 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
 
               {/* 1. Enq Date */}
               <div className="form-group">
-                <label className="form-label" htmlFor="date">Enq Date</label>
+                <label className="form-label" htmlFor="date">Enq Date <span className="required-asterisk">*</span></label>
                 <input
                   className="form-input"
                   type="date"
@@ -476,7 +476,7 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
 
               {/* 2. Company Name with Auto-Complete */}
               <div className="form-group company-autocomplete-container" style={{ position: 'relative' }}>
-                <label className="form-label" htmlFor="companyName">Company Name</label>
+                <label className="form-label" htmlFor="companyName">Company Name <span className="required-asterisk">*</span></label>
                 <input
                   className="form-input"
                   type="text"
@@ -521,7 +521,7 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
 
               {/* 3. Client Name with Auto-Complete & Contact Auto-Fill */}
               <div className="form-group client-autocomplete-container" style={{ position: 'relative' }}>
-                <label className="form-label" htmlFor="clientName">Client Name</label>
+                <label className="form-label" htmlFor="clientName">Client Name <span className="required-asterisk">*</span></label>
                 <input
                   className="form-input"
                   type="text"
@@ -566,7 +566,7 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
 
               {/* 4. Country Code & Contact Number */}
               <div className="form-group">
-                <label className="form-label" htmlFor="contactNumber">Contact Details</label>
+                <label className="form-label" htmlFor="contactNumber">Contact Details <span className="required-asterisk">*</span></label>
                 <div className="contact-input-group">
                   <select
                     className="select-filter contact-country-select"
@@ -625,7 +625,7 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
 
               {/* 7. Major Equipments */}
               <div className="form-group span-2 equip-dropdown-container" style={{ position: 'relative' }}>
-                <label className="form-label">major Equipments</label>
+                <label className="form-label">Major Equipments <span className="required-asterisk">*</span></label>
                 <div 
                   className="form-input select-filter" 
                   style={{ 
@@ -963,7 +963,9 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
 
               {/* 10. Quotation Number */}
               <div className="form-group">
-                <label className="form-label" htmlFor="quotationNumber">Quotation Number</label>
+                <label className="form-label" htmlFor="quotationNumber">
+                  Quotation Number {formData.currentStatus === 'Quotation Submitted' && <span className="required-asterisk">*</span>}
+                </label>
                 <input
                   className="form-input"
                   type="text"
@@ -977,7 +979,7 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
 
               {/* 11. Status */}
               <div className="form-group">
-                <label className="form-label" htmlFor="currentStatus">Status</label>
+                <label className="form-label" htmlFor="currentStatus">Status <span className="required-asterisk">*</span></label>
                 <select
                   className="select-filter"
                   style={{ width: '100%', height: '47px' }}
@@ -1008,7 +1010,9 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
 
               {/* 13. PO Number */}
               <div className="form-group">
-                <label className="form-label" htmlFor="poNumber">PO Number</label>
+                <label className="form-label" htmlFor="poNumber">
+                  PO Number {formData.currentStatus === 'Confirmed' && <span className="required-asterisk">*</span>}
+                </label>
                 <input
                   className="form-input"
                   type="text"
@@ -1022,7 +1026,9 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
 
               {/* Expected Date Of Dispatch */}
               <div className="form-group">
-                <label className="form-label" htmlFor="expectedDateOfDispatch">Expected Dispatch Date</label>
+                <label className="form-label" htmlFor="expectedDateOfDispatch">
+                  Expected Dispatch Date {formData.currentStatus === 'Confirmed' && <span className="required-asterisk">*</span>}
+                </label>
                 <input
                   className="form-input"
                   type="date"
@@ -1035,7 +1041,9 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
 
               {/* Project Engineer */}
               <div className="form-group pe-dropdown-container" style={{ position: 'relative' }}>
-                <label className="form-label">Project Engineer</label>
+                <label className="form-label">
+                  Project Engineer {formData.currentStatus === 'Confirmed' && <span className="required-asterisk">*</span>}
+                </label>
                 <div 
                   className="form-input select-filter" 
                   style={{ 
