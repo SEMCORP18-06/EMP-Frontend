@@ -350,7 +350,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
   const [enquiryToDelete, setEnquiryToDelete] = useState(null);
   
   // Enquiry Details Popup state
-  const [enqDetailsPopup, setEnqDetailsPopup] = useState(null);
+  const [detailsPopup, setDetailsPopup] = useState(null);
   
   // Milestone Modal state
   const [isMilestoneModalOpen, setIsMilestoneModalOpen] = useState(false);
@@ -1097,13 +1097,17 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                           </a>
                         </td>
                         <td className="col-details" style={{ minWidth: '180px', maxWidth: '300px', fontSize: '0.88rem' }}>
-                          <div 
-                            className="clamp-2-lines" 
-                            onClick={() => setEnqDetailsPopup(enq.enquiryDetails)}
-                            title="Click to view full details"
-                          >
-                            {enq.enquiryDetails}
-                          </div>
+                          {enq.enquiryDetails && enq.enquiryDetails !== '-' ? (
+                            <div 
+                              className="clamp-2-lines" 
+                              onClick={() => setDetailsPopup({ title: 'Enquiry Details', content: enq.enquiryDetails })}
+                              title="Click to view full details"
+                            >
+                              {enq.enquiryDetails}
+                            </div>
+                          ) : (
+                            '-'
+                          )}
                         </td>
                         <td className="col-equipment">{enq.majorEquipments}</td>
                         <td className="col-source">{enq.enquirySource}</td>
@@ -1142,7 +1146,19 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                         <td className="col-po">{enq.poNumber || '-'}</td>
                         <td className="col-dispatch" style={{ whiteSpace: 'nowrap' }}>{enq.expectedDateOfDispatch || '-'}</td>
                         <td className="col-engineer">{enq.projectEngineer || '-'}</td>
-                        <td className="col-comments">{enq.followUpComments || '-'}</td>
+                        <td className="col-comments" style={{ minWidth: '180px', maxWidth: '300px', fontSize: '0.88rem' }}>
+                          {enq.followUpComments && enq.followUpComments !== '-' ? (
+                            <div 
+                              className="clamp-2-lines" 
+                              onClick={() => setDetailsPopup({ title: 'Follow-Up Comments', content: enq.followUpComments })}
+                              title="Click to view full comments"
+                            >
+                              {enq.followUpComments}
+                            </div>
+                          ) : (
+                            '-'
+                          )}
+                        </td>
                           <td>
                             <div className="action-buttons">
                               {activeTab === 'enquiries' ? (
@@ -1289,19 +1305,19 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
         showSuccessToast={showSuccessToast}
       />
 
-      {/* Enquiry Details Popup Modal */}
-      {enqDetailsPopup && (
-        <div className="modal-overlay" onClick={() => setEnqDetailsPopup(null)} style={{ zIndex: 1100 }}>
+      {/* Enquiry Details & Follow-up Comments Popup Modal */}
+      {detailsPopup && (
+        <div className="modal-overlay" onClick={() => setDetailsPopup(null)} style={{ zIndex: 1100 }}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px', borderRadius: '16px' }}>
             <div className="modal-header">
-              <h3 className="modal-title">Enquiry Details</h3>
-              <button className="close-btn" onClick={() => setEnqDetailsPopup(null)}>✕</button>
+              <h3 className="modal-title">{detailsPopup.title || 'Details'}</h3>
+              <button className="close-btn" onClick={() => setDetailsPopup(null)}>✕</button>
             </div>
             <div className="modal-body" style={{ maxHeight: '60vh', overflowY: 'auto', whiteSpace: 'pre-wrap', lineHeight: '1.6', fontSize: '0.95rem', color: 'var(--text-primary)', textAlign: 'left', padding: '16px 24px' }}>
-              {enqDetailsPopup}
+              {detailsPopup.content}
             </div>
             <div className="modal-footer" style={{ borderTop: '1px solid var(--border-color)', paddingTop: '12px', paddingRight: '24px', paddingBottom: '16px', display: 'flex', justifyContent: 'flex-end' }}>
-              <button className="action-btn" style={{ background: 'var(--accent-primary)', color: '#ffffff', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }} onClick={() => setEnqDetailsPopup(null)}>
+              <button className="action-btn" style={{ background: 'var(--accent-primary)', color: '#ffffff', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' }} onClick={() => setDetailsPopup(null)}>
                 Close
               </button>
             </div>
