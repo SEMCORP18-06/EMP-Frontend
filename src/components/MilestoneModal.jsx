@@ -743,7 +743,7 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
             // Close ONLY the remarks popup
             setActiveRemarksMilestoneIdx(null);
 
-            onSubmit(mappedMilestones, false, false, false);
+            onSubmit(mappedMilestones, false, true, false);
           }}
           currentUsername={username}
           currentDisplayName={displayName}
