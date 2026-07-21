@@ -1311,7 +1311,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
           <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px', borderRadius: '16px' }}>
             <div className="modal-header">
               <h3 className="modal-title">{detailsPopup.title || 'Details'}</h3>
-              <button className="close-btn" onClick={() => setDetailsPopup(null)}>✕</button>
+              <button className="modal-close" onClick={() => setDetailsPopup(null)} title="Close Popup" aria-label="Close">✕</button>
             </div>
             <div className="modal-body" style={{ maxHeight: '60vh', overflowY: 'auto', whiteSpace: 'pre-wrap', lineHeight: '1.6', fontSize: '0.95rem', color: 'var(--text-primary)', textAlign: 'left', padding: '16px 24px' }}>
               {detailsPopup.content}
