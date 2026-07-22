@@ -17,6 +17,7 @@
   
   --status-costing: #fbbf24;
   --status-offer: #60a5fa;
+  --status-revise-offer: #38bdf8;
   --status-followup: #c084fc;
   --status-negotiation: #22d3ee;
   --status-lost: #f87171;
@@ -47,6 +48,7 @@
 
   --status-costing: #d97706;
   --status-offer: #2563eb;
+  --status-revise-offer: #0284c7;
   --status-followup: #9333ea;
   --status-negotiation: #0891b2;
   --status-lost: #dc2626;
@@ -711,6 +713,13 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--status-offer);
   border: 1px solid rgba(96, 165, 250, 0.25);
   box-shadow: 0 2px 8px rgba(96, 165, 250, 0.05);
+}
+
+.status-badge.revise-offer {
+  background: rgba(56, 189, 248, 0.08);
+  color: var(--status-revise-offer);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  box-shadow: 0 2px 8px rgba(56, 189, 248, 0.05);
 }
 
 .status-badge.follow-up {

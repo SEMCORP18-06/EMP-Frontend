@@ -153,6 +153,7 @@ const mapStatus = (status) => {
   const clean = status.trim().toLowerCase();
   
   if (clean.includes("costing")) return "Costing";
+  if (clean.includes("revise")) return "Revise Offer";
   if (clean.includes("offer")) return "Offer submitted";
   if (clean.includes("follow-up") || clean.includes("followup") || clean.includes("in progress")) return "Follow-up in progress";
   if (clean.includes("quotation")) return "Quotation Submitted";
@@ -715,6 +716,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
     switch (status) {
       case 'Costing': return 'costing';
       case 'Offer submitted': return 'offer';
+      case 'Revise Offer': return 'revise-offer';
       case 'Follow-up in progress': return 'follow-up';
       case 'Negotiation ongoing': return 'negotiation';
       case 'Lost': return 'lost';
@@ -1051,6 +1053,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                 <option value="">All Statuses</option>
                                 <option value="Costing">Costing</option>
                                 <option value="Offer submitted">Offer Submitted</option>
+                                <option value="Revise Offer">Revise Offer</option>
                                 <option value="Follow-up in progress">Follow-up In Progress</option>
                                 <option value="Negotiation ongoing">Negotiation Ongoing</option>
                                 <option value="Lost">Lost</option>

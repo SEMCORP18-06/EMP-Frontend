@@ -7,6 +7,7 @@ import { API_BASE } from '../config';
 const STATUS_OPTIONS = [
   "Costing",
   "Offer submitted",
+  "Revise Offer",
   "Follow-up in progress",
   "Quotation Submitted",
   "Negotiation ongoing",
@@ -366,7 +367,7 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === 'currentStatus' && value === 'Offer submitted') {
+    if (name === 'currentStatus' && (value === 'Offer submitted' || value === 'Revise Offer')) {
       setFormData(prev => ({
         ...prev,
         currentStatus: value,

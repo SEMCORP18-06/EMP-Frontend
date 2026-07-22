@@ -421,6 +421,7 @@ export default function DashboardAnalytics({ enquiries }) {
     const stages = [
       "Costing",
       "Offer submitted",
+      "Revise Offer",
       "Follow-up in progress",
       "Negotiation ongoing",
       "Lost",
