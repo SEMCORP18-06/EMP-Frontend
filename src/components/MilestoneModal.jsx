@@ -290,9 +290,6 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
 
   const hasNewlyAllottedMilestones = (milestones) => {
     const originalMilestones = enquiry?.milestones || [];
-    if (milestones.length !== originalMilestones.length) {
-      return true;
-    }
     for (let i = 0; i < milestones.length; i++) {
       const sub = milestones[i];
       if (!sub.fpr || !sub.fpr.trim()) {
@@ -306,18 +303,6 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
         const subFpr = sub.fpr.trim();
         if (origFpr !== subFpr) {
           return true;
-        } else {
-          const nameChanged = (orig.name || '').trim() !== (sub.name || '').trim();
-          const startChanged = (orig.startDate || '') !== (sub.startDate || '');
-          const endChanged = (orig.endDate || '') !== (sub.endDate || '');
-          const statusChanged = (orig.status || '') !== (sub.status || '');
-          const remarkChanged = (orig.remark || '').trim() !== (sub.remark || '').trim();
-          const actualEndChanged = (orig.actualEndDate || '') !== (sub.actualEndDate || '');
-          const percentageChanged = (Number(orig.percentage) || 0) !== (Number(sub.percentage) || 0);
-
-          if (nameChanged || startChanged || endChanged || statusChanged || remarkChanged || actualEndChanged || percentageChanged) {
-            return true;
-          }
         }
       }
     }
