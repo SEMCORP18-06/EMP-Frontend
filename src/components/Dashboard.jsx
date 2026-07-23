@@ -1007,7 +1007,8 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                           )}
                         </th>
                       )}
-                      {activeTab !== 'milestones' && <th className="col-company">Company Name</th>}
+                      <th className="col-company">Company Name</th>
+                      {activeTab === 'milestones' && <th className="col-po">PO Number</th>}
                       <th>Client Name</th>
                       <th className="col-contact">Country Code</th>
                       <th className="col-contact">Contact Number</th>
@@ -1095,25 +1096,13 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                       <tr key={enq._id}>
                         {activeTab === 'milestones' ? (
                           <td className="col-project-no" style={{ fontWeight: '600', color: 'var(--accent-primary)', whiteSpace: 'nowrap' }}>
-                            {enq.projectNumber && enq.projectNumber !== '-' ? (
-                              enq.projectNumber
-                            ) : (
-                              <span 
-                                style={{ cursor: 'pointer', color: 'var(--accent-primary)', fontSize: '0.85rem', textDecoration: 'underline' }}
-                                onClick={() => {
-                                  setSelectedEnquiry(enq);
-                                  setIsEnquiryModalOpen(true);
-                                }}
-                                title="Click to enter Project No."
-                              >
-                                + Add Project No.
-                              </span>
-                            )}
+                            {enq.projectNumber || '-'}
                           </td>
                         ) : (
                           <td style={{ whiteSpace: 'nowrap' }}>{enq.date}</td>
                         )}
-                        {activeTab !== 'milestones' && <td className="col-company">{enq.companyName}</td>}
+                        <td className="col-company">{enq.companyName}</td>
+                        {activeTab === 'milestones' && <td className="col-po" style={{ fontWeight: '600' }}>{enq.poNumber || '-'}</td>}
                         <td>{enq.clientName}</td>
                         <td className="col-contact">{enq.contactCountryCode}</td>
                         <td className="col-contact">{enq.contactNumber}</td>
