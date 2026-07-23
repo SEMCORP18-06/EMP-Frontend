@@ -410,8 +410,8 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
                   <tr>
                     <th className="col-milestone" style={{ width: isAdmin ? '20%' : '24%' }}>Milestone <span style={{ color: 'red' }}>*</span></th>
                     <th style={{ width: isAdmin ? '11%' : '12%' }}>FPR</th>
-                    <th style={{ width: '10%' }}>Start Date</th>
                     <th style={{ width: '7%' }}>Days</th>
+                    <th style={{ width: '10%' }}>Start Date</th>
                     <th style={{ width: '10%' }}>End Date</th>
                     <th style={{ width: '10%' }}>Actual End Date</th>
                     <th style={{ width: '9%' }}>Status</th>
@@ -603,15 +603,6 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
                             </td>
                             <td>
                               <input
-                                type="date"
-                                className="form-input table-input"
-                                style={{ width: '100%', minWidth: '100px' }}
-                                value={m.startDate}
-                                onChange={(e) => handleFieldChange(idx, 'startDate', e.target.value)}
-                              />
-                            </td>
-                            <td>
-                              <input
                                 type="number"
                                 className="form-input table-input"
                                 style={{ width: '100%', minWidth: '55px', textAlign: 'center' }}
@@ -619,6 +610,15 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
                                 onChange={(e) => handleFieldChange(idx, 'days', e.target.value)}
                                 placeholder="Days"
                                 min="0"
+                              />
+                            </td>
+                            <td>
+                              <input
+                                type="date"
+                                className="form-input table-input"
+                                style={{ width: '100%', minWidth: '100px' }}
+                                value={m.startDate}
+                                onChange={(e) => handleFieldChange(idx, 'startDate', e.target.value)}
                               />
                             </td>
                             <td>
@@ -697,8 +697,8 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
                           <>
                             <td className="col-milestone" style={{ fontWeight: '600' }}>{m.name}</td>
                             <td>{m.fpr || '-'}</td>
-                            <td>{m.startDate || '-'}</td>
                             <td style={{ textAlign: 'center', fontWeight: '600' }}>{m.days !== undefined && m.days !== '' ? m.days : (calculateDays(m.startDate, m.endDate) || '-')}</td>
+                            <td>{m.startDate || '-'}</td>
                             <td>{m.endDate || '-'}</td>
                             <td>{m.actualEndDate || '-'}</td>
                             <td>
