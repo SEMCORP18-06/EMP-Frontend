@@ -1042,7 +1042,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                       )}
                       <th className="col-company">Company Name</th>
                       {activeTab === 'milestones' && <th className="col-po">PO Number</th>}
-                      <th>Client Name</th>
+                      <th>Client POC</th>
                       <th className="col-contact">Country Code</th>
                       <th className="col-contact">Contact Number</th>
                       <th className="col-mail">Mail ID</th>
