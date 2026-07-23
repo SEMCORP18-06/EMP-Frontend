@@ -939,80 +939,84 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                 <table className="custom-table">
                   <thead>
                     <tr>
-                      <th>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                          <span>Enq Date</span>
-                          <button 
-                            onClick={() => {
-                              setShowDateDropdown(!showDateDropdown);
-                              setShowStatusDropdown(false);
-                            }}
-                            style={{ 
-                              background: 'none', 
-                              border: 'none', 
-                              cursor: 'pointer', 
-                              padding: '2px', 
-                              fontSize: '0.85rem', 
-                              color: (startDateFilter || endDateFilter) ? 'var(--accent-primary)' : 'var(--text-muted)',
-                              display: 'inline-flex', 
-                              alignItems: 'center' 
-                            }}
-                            title="Filter by Date"
-                          >
-                            <svg viewBox="0 0 20 20" fill="currentColor" style={{ width: '16px', height: '16px' }}>
-                              <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" />
-                            </svg>
-                          </button>
-                        </div>
-                        {showDateDropdown && (
-                          <div className="header-filter-dropdown">
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                              <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>From Date:</label>
-                              <input 
-                                type="date" 
-                                className="select-filter"
-                                style={{ width: '100%' }}
-                                value={startDateFilter}
-                                onChange={(e) => setStartDateFilter(e.target.value)}
-                              />
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                              <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>To Date:</label>
-                              <input 
-                                type="date" 
-                                className="select-filter"
-                                style={{ width: '100%' }}
-                                value={endDateFilter}
-                                onChange={(e) => setEndDateFilter(e.target.value)}
-                              />
-                            </div>
-                            <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
-                              <button 
-                                onClick={() => { setStartDateFilter(''); setEndDateFilter(''); setShowDateDropdown(false); }}
-                                style={{ flex: 1, padding: '6px 12px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-primary)', cursor: 'pointer', fontSize: '0.8rem' }}
-                              >
-                                Clear
-                              </button>
-                              <button 
-                                onClick={() => setShowDateDropdown(false)}
-                                style={{ flex: 1, padding: '6px 12px', borderRadius: '6px', border: 'none', background: 'var(--accent-primary)', color: '#ffffff', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}
-                              >
-                                Apply
-                              </button>
-                            </div>
+                      {activeTab === 'milestones' ? (
+                        <th className="col-project-no">Project No.</th>
+                      ) : (
+                        <th>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                            <span>Enq Date</span>
+                            <button 
+                              onClick={() => {
+                                setShowDateDropdown(!showDateDropdown);
+                                setShowStatusDropdown(false);
+                              }}
+                              style={{ 
+                                background: 'none', 
+                                border: 'none', 
+                                cursor: 'pointer', 
+                                padding: '2px', 
+                                fontSize: '0.85rem', 
+                                color: (startDateFilter || endDateFilter) ? 'var(--accent-primary)' : 'var(--text-muted)',
+                                display: 'inline-flex', 
+                                alignItems: 'center' 
+                              }}
+                              title="Filter by Date"
+                            >
+                              <svg viewBox="0 0 20 20" fill="currentColor" style={{ width: '16px', height: '16px' }}>
+                                <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" />
+                              </svg>
+                            </button>
                           </div>
-                        )}
-                      </th>
-                      <th className="col-company">Company Name</th>
+                          {showDateDropdown && (
+                            <div className="header-filter-dropdown">
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>From Date:</label>
+                                <input 
+                                  type="date" 
+                                  className="select-filter"
+                                  style={{ width: '100%' }}
+                                  value={startDateFilter}
+                                  onChange={(e) => setStartDateFilter(e.target.value)}
+                                />
+                              </div>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>To Date:</label>
+                                <input 
+                                  type="date" 
+                                  className="select-filter"
+                                  style={{ width: '100%' }}
+                                  value={endDateFilter}
+                                  onChange={(e) => setEndDateFilter(e.target.value)}
+                                />
+                              </div>
+                              <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                                <button 
+                                  onClick={() => { setStartDateFilter(''); setEndDateFilter(''); setShowDateDropdown(false); }}
+                                  style={{ flex: 1, padding: '6px 12px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-primary)', cursor: 'pointer', fontSize: '0.8rem' }}
+                                >
+                                  Clear
+                                </button>
+                                <button 
+                                  onClick={() => setShowDateDropdown(false)}
+                                  style={{ flex: 1, padding: '6px 12px', borderRadius: '6px', border: 'none', background: 'var(--accent-primary)', color: '#ffffff', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}
+                                >
+                                  Apply
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </th>
+                      )}
+                      {activeTab !== 'milestones' && <th className="col-company">Company Name</th>}
                       <th>Client Name</th>
                       <th className="col-contact">Country Code</th>
                       <th className="col-contact">Contact Number</th>
                       <th className="col-mail">Mail ID</th>
                       <th className="col-details">Enq Details</th>
-                      <th className="col-equipment">Major Equipments</th>
-                      <th className="col-source">Source</th>
-                      <th>FPR</th>
-                      <th className="col-quotation">Quotation Number</th>
+                      {activeTab !== 'milestones' && <th className="col-equipment">Major Equipments</th>}
+                      {activeTab !== 'milestones' && <th className="col-source">Source</th>}
+                      {activeTab !== 'milestones' && <th>FPR</th>}
+                      {activeTab !== 'milestones' && <th className="col-quotation">Quotation Number</th>}
                       <th>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
                           <span>Status</span>
@@ -1082,15 +1086,34 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                       <th className="col-po">PO Number</th>
                       <th className="col-dispatch">Expected Dispatch Date</th>
                       <th className="col-engineer">Project Engineer</th>
-                      <th className="col-comments">Follow-up Comments</th>
+                      {activeTab !== 'milestones' && <th className="col-comments">Follow-up Comments</th>}
                       <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredEnquiries.map((enq) => (
                       <tr key={enq._id}>
-                        <td style={{ whiteSpace: 'nowrap' }}>{enq.date}</td>
-                        <td className="col-company">{enq.companyName}</td>
+                        {activeTab === 'milestones' ? (
+                          <td className="col-project-no" style={{ fontWeight: '600', color: 'var(--accent-primary)', whiteSpace: 'nowrap' }}>
+                            {enq.projectNumber && enq.projectNumber !== '-' ? (
+                              enq.projectNumber
+                            ) : (
+                              <span 
+                                style={{ cursor: 'pointer', color: 'var(--accent-primary)', fontSize: '0.85rem', textDecoration: 'underline' }}
+                                onClick={() => {
+                                  setSelectedEnquiry(enq);
+                                  setIsEnquiryModalOpen(true);
+                                }}
+                                title="Click to enter Project No."
+                              >
+                                + Add Project No.
+                              </span>
+                            )}
+                          </td>
+                        ) : (
+                          <td style={{ whiteSpace: 'nowrap' }}>{enq.date}</td>
+                        )}
+                        {activeTab !== 'milestones' && <td className="col-company">{enq.companyName}</td>}
                         <td>{enq.clientName}</td>
                         <td className="col-contact">{enq.contactCountryCode}</td>
                         <td className="col-contact">{enq.contactNumber}</td>
@@ -1112,10 +1135,10 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                             '-'
                           )}
                         </td>
-                        <td className="col-equipment">{enq.majorEquipments}</td>
-                        <td className="col-source">{enq.enquirySource}</td>
-                        <td>{enq.fpr || '-'}</td>
-                        <td className="col-quotation" style={{ fontWeight: '600' }}>{enq.quotationNumber || '-'}</td>
+                        {activeTab !== 'milestones' && <td className="col-equipment">{enq.majorEquipments}</td>}
+                        {activeTab !== 'milestones' && <td className="col-source">{enq.enquirySource}</td>}
+                        {activeTab !== 'milestones' && <td>{enq.fpr || '-'}</td>}
+                        {activeTab !== 'milestones' && <td className="col-quotation" style={{ fontWeight: '600' }}>{enq.quotationNumber || '-'}</td>}
                         <td>
                           {activeTab === 'milestones' ? (
                             <div style={{ minWidth: '100px' }}>
@@ -1149,82 +1172,114 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                         <td className="col-po">{enq.poNumber || '-'}</td>
                         <td className="col-dispatch" style={{ whiteSpace: 'nowrap' }}>{enq.expectedDateOfDispatch || '-'}</td>
                         <td className="col-engineer">{enq.projectEngineer || '-'}</td>
-                        <td className="col-comments" style={{ minWidth: '180px', maxWidth: '300px', fontSize: '0.88rem' }}>
-                          {enq.followUpComments && enq.followUpComments !== '-' ? (
-                            <div 
-                              className="clamp-2-lines" 
-                              onClick={() => setDetailsPopup({ title: 'Follow-Up Comments', content: enq.followUpComments })}
-                              title="Click to view full comments"
-                            >
-                              {enq.followUpComments}
-                            </div>
-                          ) : (
-                            '-'
-                          )}
-                        </td>
-                          <td>
-                            <div className="action-buttons">
-                              {activeTab === 'enquiries' ? (
-                                <>
-                                  <button 
-                                    className="action-btn modify"
-                                    title="Modify Enquiry"
-                                    onClick={() => {
-                                      setSelectedEnquiry(enq);
-                                      setIsEnquiryModalOpen(true);
-                                    }}
-                                  >
-                                    ✏️
-                                  </button>
-                                  <button 
-                                    className="action-btn delete"
-                                    title="Delete Enquiry"
-                                    onClick={() => {
-                                      setEnquiryToDelete(enq);
-                                      setIsDeleteModalOpen(true);
-                                    }}
-                                  >
-                                    🗑️
-                                  </button>
-                                  {enq.currentStatus === 'Confirmed' && (
-                                    <button 
-                                      className="action-btn mail-btn"
-                                      title="Send Email to Client"
-                                      onClick={() => {
-                                        setEnquiryForCustomMail(enq);
-                                        setIsSendMailModalOpen(true);
-                                      }}
-                                    >
-                                      📧
-                                    </button>
-                                  )}
-                                </>
-                              ) : (
-                                <div className="confirmed-action-buttons">
-                                  <button 
-                                    className="action-btn add-milestone"
-                                    onClick={() => {
-                                      setEnquiryForMilestone(enq);
-                                      setIsMilestoneModalOpen(true);
-                                    }}
-                                    title="Add or Modify Project Milestones"
-                                  >
-                                    📋 Milestones
-                                  </button>
-                                  <button 
-                                    className="action-btn gantt-btn"
-                                    onClick={() => {
-                                      setEnquiryForGantt(enq);
-                                      setIsGanttModalOpen(true);
-                                    }}
-                                    title="View Gantt Chart Timeline"
-                                  >
-                                    📊 Gantt
-                                  </button>
-                                </div>
-                              )}
-                            </div>
+                        {activeTab !== 'milestones' && (
+                          <td className="col-comments" style={{ minWidth: '180px', maxWidth: '300px', fontSize: '0.88rem' }}>
+                            {enq.followUpComments && enq.followUpComments !== '-' ? (
+                              <div 
+                                className="clamp-2-lines" 
+                                onClick={() => setDetailsPopup({ title: 'Follow-Up Comments', content: enq.followUpComments })}
+                                title="Click to view full comments"
+                              >
+                                {enq.followUpComments}
+                              </div>
+                            ) : (
+                              '-'
+                            )}
                           </td>
+                        )}
+                        <td>
+                          <div className="action-buttons">
+                            {activeTab === 'enquiries' ? (
+                              <>
+                                <button 
+                                  className="action-btn modify"
+                                  title="Modify Enquiry"
+                                  onClick={() => {
+                                    setSelectedEnquiry(enq);
+                                    setIsEnquiryModalOpen(true);
+                                  }}
+                                >
+                                  ✏️
+                                </button>
+                                <button 
+                                  className="action-btn delete"
+                                  title="Delete Enquiry"
+                                  onClick={() => {
+                                    setEnquiryToDelete(enq);
+                                    setIsDeleteModalOpen(true);
+                                  }}
+                                >
+                                  🗑️
+                                </button>
+                                {enq.currentStatus === 'Confirmed' && (
+                                  <button 
+                                    className="action-btn mail-btn"
+                                    title="Send Email to Client"
+                                    onClick={() => {
+                                      setEnquiryForCustomMail(enq);
+                                      setIsSendMailModalOpen(true);
+                                    }}
+                                  >
+                                    📧
+                                  </button>
+                                )}
+                              </>
+                            ) : (
+                              <div className="confirmed-action-buttons" style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                                <button 
+                                  className="action-btn add-milestone"
+                                  onClick={() => {
+                                    setEnquiryForMilestone(enq);
+                                    setIsMilestoneModalOpen(true);
+                                  }}
+                                  title="Add or Modify Project Milestones"
+                                >
+                                  📋 Milestones
+                                </button>
+                                <button 
+                                  className="action-btn gantt-btn"
+                                  onClick={() => {
+                                    setEnquiryForGantt(enq);
+                                    setIsGanttModalOpen(true);
+                                  }}
+                                  title="View Gantt Chart Timeline"
+                                >
+                                  📊 Gantt
+                                </button>
+                                <button 
+                                  className="action-btn modify"
+                                  title="Modify Order Details / Project No."
+                                  onClick={() => {
+                                    setSelectedEnquiry(enq);
+                                    setIsEnquiryModalOpen(true);
+                                  }}
+                                >
+                                  ✏️
+                                </button>
+                                <button 
+                                  className="action-btn mail-btn"
+                                  title="Send Email to Client"
+                                  onClick={() => {
+                                    setEnquiryForCustomMail(enq);
+                                    setIsSendMailModalOpen(true);
+                                  }}
+                                >
+                                  📧
+                                </button>
+                                <button 
+                                  className="action-btn delete"
+                                  title="Delete / Move to Bin"
+                                  onClick={() => {
+                                    setEnquiryToDelete(enq);
+                                    setIsDeleteModalOpen(true);
+                                  }}
+                                >
+                                  🗑️
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>

@@ -84,6 +84,7 @@ const INITIAL_STATE = {
   poNumber: '',
   expectedDateOfDispatch: '',
   projectEngineer: '',
+  projectNumber: '',
   followUpComments: ''
 };
 
@@ -348,6 +349,7 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
         poNumber: enquiry.poNumber || '',
         expectedDateOfDispatch: enquiry.expectedDateOfDispatch || '',
         projectEngineer: enquiry.projectEngineer || '',
+        projectNumber: enquiry.projectNumber || '',
         followUpComments: enquiry.followUpComments || ''
       });
     } else {
@@ -1021,6 +1023,22 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
                   name="poNumber"
                   placeholder="Enter PO Number"
                   value={formData.poNumber}
+                  onChange={handleChange}
+                />
+              </div>
+
+              {/* Project No. */}
+              <div className="form-group">
+                <label className="form-label" htmlFor="projectNumber">
+                  Project No.
+                </label>
+                <input
+                  className="form-input"
+                  type="text"
+                  id="projectNumber"
+                  name="projectNumber"
+                  placeholder="Enter Project No."
+                  value={formData.projectNumber || ''}
                   onChange={handleChange}
                 />
               </div>
