@@ -398,6 +398,39 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
     }, duration);
   };
 
+  // Ref for debounced auto-save timers for Project No.
+  const projectNoSaveDebounceRef = useRef({});
+
+  const saveProjectNumber = async (enquiryId, value) => {
+    try {
+      const res = await fetch(`${API_BASE}/enquiries/${enquiryId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ projectNumber: value })
+      });
+      if (!res.ok) {
+        console.error('Failed to auto-save Project No.');
+      }
+    } catch (err) {
+      console.error('Error auto-saving Project No.:', err);
+    }
+  };
+
+  const handleProjectNumberChange = (enquiryId, value) => {
+    setEnquiries(prev => prev.map(item => item._id === enquiryId ? { ...item, projectNumber: value } : item));
+
+    if (projectNoSaveDebounceRef.current[enquiryId]) {
+      clearTimeout(projectNoSaveDebounceRef.current[enquiryId]);
+    }
+
+    projectNoSaveDebounceRef.current[enquiryId] = setTimeout(() => {
+      saveProjectNumber(enquiryId, value);
+    }, 500);
+  };
+
   const isAdmin = userRole === 'Admin';
 
   const fetchEnquiries = async () => {
@@ -1095,8 +1128,25 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                     {filteredEnquiries.map((enq) => (
                       <tr key={enq._id}>
                         {activeTab === 'milestones' ? (
-                          <td className="col-project-no" style={{ fontWeight: '600', color: 'var(--accent-primary)', whiteSpace: 'nowrap' }}>
-                            {enq.projectNumber || '-'}
+                          <td className="col-project-no" style={{ whiteSpace: 'nowrap' }}>
+                            <input
+                              type="text"
+                              className="form-input project-no-inline-input"
+                              style={{
+                                width: '130px',
+                                padding: '4px 8px',
+                                fontSize: '0.85rem',
+                                borderRadius: '6px',
+                                border: '1px solid var(--border-color)',
+                                background: 'var(--bg-secondary)',
+                                color: 'var(--text-primary)',
+                                fontWeight: '600'
+                              }}
+                              placeholder="Enter Project No."
+                              value={enq.projectNumber || ''}
+                              onChange={(e) => handleProjectNumberChange(enq._id, e.target.value)}
+                              onBlur={(e) => saveProjectNumber(enq._id, e.target.value)}
+                            />
                           </td>
                         ) : (
                           <td style={{ whiteSpace: 'nowrap' }}>{enq.date}</td>
