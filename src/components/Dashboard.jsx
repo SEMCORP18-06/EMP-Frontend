@@ -1041,8 +1041,8 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                         </th>
                       )}
                       <th className="col-company">Company Name</th>
-                      {activeTab === 'milestones' && <th className="col-po">PO Number</th>}
                       <th>Client POC</th>
+                      {activeTab === 'milestones' && <th className="col-po">PO Number</th>}
                       <th className="col-contact">Country Code</th>
                       <th className="col-contact">Contact Number</th>
                       <th className="col-mail">Mail ID</th>
@@ -1152,8 +1152,8 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                           <td style={{ whiteSpace: 'nowrap' }}>{enq.date}</td>
                         )}
                         <td className="col-company">{enq.companyName}</td>
-                        {activeTab === 'milestones' && <td className="col-po" style={{ fontWeight: '600' }}>{enq.poNumber || '-'}</td>}
                         <td>{enq.clientName}</td>
+                        {activeTab === 'milestones' && <td className="col-po" style={{ fontWeight: '600' }}>{enq.poNumber || '-'}</td>}
                         <td className="col-contact">{enq.contactCountryCode}</td>
                         <td className="col-contact">{enq.contactNumber}</td>
                         <td className="col-mail">
