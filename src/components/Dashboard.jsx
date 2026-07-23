@@ -1082,8 +1082,8 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                           </div>
                         )}
                       </th>
-                      <th className="col-offer-date">Offter Sub Date</th>
-                      <th className="col-po">PO Number</th>
+                      {activeTab !== 'milestones' && <th className="col-offer-date">Offter Sub Date</th>}
+                      {activeTab !== 'milestones' && <th className="col-po">PO Number</th>}
                       <th className="col-dispatch">Expected Dispatch Date</th>
                       <th className="col-engineer">Project Engineer</th>
                       {activeTab !== 'milestones' && <th className="col-comments">Follow-up Comments</th>}
@@ -1168,8 +1168,8 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                             </span>
                           )}
                         </td>
-                        <td className="col-offer-date" style={{ whiteSpace: 'nowrap' }}>{enq.offerSubmittedDate || '-'}</td>
-                        <td className="col-po">{enq.poNumber || '-'}</td>
+                        {activeTab !== 'milestones' && <td className="col-offer-date" style={{ whiteSpace: 'nowrap' }}>{enq.offerSubmittedDate || '-'}</td>}
+                        {activeTab !== 'milestones' && <td className="col-po">{enq.poNumber || '-'}</td>}
                         <td className="col-dispatch" style={{ whiteSpace: 'nowrap' }}>{enq.expectedDateOfDispatch || '-'}</td>
                         <td className="col-engineer">{enq.projectEngineer || '-'}</td>
                         {activeTab !== 'milestones' && (
@@ -1245,36 +1245,6 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                   title="View Gantt Chart Timeline"
                                 >
                                   📊 Gantt
-                                </button>
-                                <button 
-                                  className="action-btn modify"
-                                  title="Modify Order Details / Project No."
-                                  onClick={() => {
-                                    setSelectedEnquiry(enq);
-                                    setIsEnquiryModalOpen(true);
-                                  }}
-                                >
-                                  ✏️
-                                </button>
-                                <button 
-                                  className="action-btn mail-btn"
-                                  title="Send Email to Client"
-                                  onClick={() => {
-                                    setEnquiryForCustomMail(enq);
-                                    setIsSendMailModalOpen(true);
-                                  }}
-                                >
-                                  📧
-                                </button>
-                                <button 
-                                  className="action-btn delete"
-                                  title="Delete / Move to Bin"
-                                  onClick={() => {
-                                    setEnquiryToDelete(enq);
-                                    setIsDeleteModalOpen(true);
-                                  }}
-                                >
-                                  🗑️
                                 </button>
                               </div>
                             )}
