@@ -44,6 +44,29 @@ const getInitials = (name) => {
   return parts[0] ? parts[0].substring(0, 2).toUpperCase() : '';
 };
 
+const calculateEndDate = (startDateStr, daysVal) => {
+  if (!startDateStr || startDateStr.trim() === '') return '';
+  const numDays = parseInt(daysVal, 10);
+  if (isNaN(numDays)) return '';
+  
+  const date = new Date(startDateStr);
+  if (isNaN(date.getTime())) return '';
+  
+  date.setDate(date.getDate() + numDays);
+  return date.toISOString().split('T')[0];
+};
+
+const calculateDays = (startDateStr, endDateStr) => {
+  if (!startDateStr || !endDateStr) return '';
+  const d1 = new Date(startDateStr);
+  const d2 = new Date(endDateStr);
+  if (isNaN(d1.getTime()) || isNaN(d2.getTime())) return '';
+  
+  const diffTime = d2.getTime() - d1.getTime();
+  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays >= 0 ? diffDays : '';
+};
+
 const getAvatarColor = (name) => {
   const colors = [
     '#6366f1', // Indigo
@@ -133,8 +156,13 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
               updatedAt: enquiry.updatedAt || enquiry.createdAt || new Date().toISOString()
             });
           }
+          const computedDays = m.days !== undefined && m.days !== null && m.days !== '' 
+            ? m.days 
+            : calculateDays(m.startDate, m.endDate);
+
           return {
             ...m,
+            days: computedDays,
             remarks: remarksArr
           };
         });
@@ -145,6 +173,7 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
           fpr: '',
           startDate: '',
           endDate: '',
+          days: '',
           actualEndDate: '',
           status: 'Pending',
           remark: '',
@@ -190,17 +219,41 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
 
   const handleFieldChange = (index, field, value) => {
     const updated = [...localMilestones];
-    updated[index] = {
+    let currentItem = {
       ...updated[index],
       [field]: value
     };
-    if (field === 'status') {
-      if (value === 'Completed') {
-        updated[index].actualEndDate = new Date().toISOString().split('T')[0];
-      } else if (value === 'In Progress' || value === 'Pending') {
-        updated[index].actualEndDate = '';
+
+    if (field === 'days') {
+      if (currentItem.startDate && value !== '' && value !== null) {
+        const newEndDate = calculateEndDate(currentItem.startDate, value);
+        if (newEndDate) {
+          currentItem.endDate = newEndDate;
+        }
+      }
+    } else if (field === 'startDate') {
+      if (currentItem.days !== '' && currentItem.days !== undefined && currentItem.days !== null) {
+        const newEndDate = calculateEndDate(value, currentItem.days);
+        if (newEndDate) {
+          currentItem.endDate = newEndDate;
+        }
+      } else if (currentItem.endDate) {
+        currentItem.days = calculateDays(value, currentItem.endDate);
+      }
+    } else if (field === 'endDate') {
+      if (currentItem.startDate) {
+        currentItem.days = calculateDays(currentItem.startDate, value);
       }
     }
+
+    if (field === 'status') {
+      if (value === 'Completed') {
+        currentItem.actualEndDate = new Date().toISOString().split('T')[0];
+      } else if (value === 'In Progress' || value === 'Pending') {
+        currentItem.actualEndDate = '';
+      }
+    }
+    updated[index] = currentItem;
     setLocalMilestones(updated);
   };
 
@@ -290,6 +343,7 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
       fpr: m.fpr ? m.fpr.trim() : '',
       startDate: m.startDate || '',
       endDate: m.endDate || '',
+      days: m.days !== undefined && m.days !== '' ? Number(m.days) : (calculateDays(m.startDate, m.endDate) || 0),
       actualEndDate: m.actualEndDate || '',
       status: m.status || 'Pending',
       remark: (m.remarks && m.remarks.length > 0) ? m.remarks[m.remarks.length - 1].text : (m.remark || ''),
@@ -369,14 +423,15 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
               <table className="custom-table milestone-table" style={{ width: '100%' }}>
                 <thead>
                   <tr>
-                    <th className="col-milestone" style={{ width: isAdmin ? '22%' : '26%' }}>Milestone <span style={{ color: 'red' }}>*</span></th>
+                    <th className="col-milestone" style={{ width: isAdmin ? '20%' : '24%' }}>Milestone <span style={{ color: 'red' }}>*</span></th>
                     <th style={{ width: isAdmin ? '11%' : '12%' }}>FPR</th>
-                    <th style={{ width: '10.5%' }}>Start Date</th>
-                    <th style={{ width: '10.5%' }}>End Date</th>
-                    <th style={{ width: '10.5%' }}>Actual End Date</th>
-                    <th style={{ width: '10.5%' }}>Status</th>
-                    <th className="col-remark" style={{ width: isAdmin ? '13.5%' : '14.5%' }}>Remark</th>
-                    <th style={{ width: '7.5%' }}>Weight (%)</th>
+                    <th style={{ width: '10%' }}>Start Date</th>
+                    <th style={{ width: '7%' }}>Days</th>
+                    <th style={{ width: '10%' }}>End Date</th>
+                    <th style={{ width: '10%' }}>Actual End Date</th>
+                    <th style={{ width: '9%' }}>Status</th>
+                    <th className="col-remark" style={{ width: isAdmin ? '12%' : '13%' }}>Remark</th>
+                    <th style={{ width: '7%' }}>Weight (%)</th>
                     {isAdmin && <th style={{ width: '4%' }}>Action</th>}
                   </tr>
                 </thead>
@@ -565,16 +620,27 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
                               <input
                                 type="date"
                                 className="form-input table-input"
-                                style={{ width: '100%', minWidth: '105px' }}
+                                style={{ width: '100%', minWidth: '100px' }}
                                 value={m.startDate}
                                 onChange={(e) => handleFieldChange(idx, 'startDate', e.target.value)}
                               />
                             </td>
                             <td>
                               <input
+                                type="number"
+                                className="form-input table-input"
+                                style={{ width: '100%', minWidth: '55px', textAlign: 'center' }}
+                                value={m.days !== undefined ? m.days : ''}
+                                onChange={(e) => handleFieldChange(idx, 'days', e.target.value)}
+                                placeholder="Days"
+                                min="0"
+                              />
+                            </td>
+                            <td>
+                              <input
                                 type="date"
                                 className="form-input table-input"
-                                style={{ width: '100%', minWidth: '105px' }}
+                                style={{ width: '100%', minWidth: '100px' }}
                                 value={m.endDate}
                                 onChange={(e) => handleFieldChange(idx, 'endDate', e.target.value)}
                               />
@@ -647,6 +713,7 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
                             <td className="col-milestone" style={{ fontWeight: '600' }}>{m.name}</td>
                             <td>{m.fpr || '-'}</td>
                             <td>{m.startDate || '-'}</td>
+                            <td style={{ textAlign: 'center', fontWeight: '600' }}>{m.days !== undefined && m.days !== '' ? m.days : (calculateDays(m.startDate, m.endDate) || '-')}</td>
                             <td>{m.endDate || '-'}</td>
                             <td>{m.actualEndDate || '-'}</td>
                             <td>
