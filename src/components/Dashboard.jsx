@@ -10,6 +10,62 @@ import GanttModal from './GanttModal';
 import SendMailModal from './SendMailModal';
 import { API_BASE } from '../config';
 
+const calculateDaysHelper = (startDateStr, endDateStr) => {
+  if (!startDateStr || !endDateStr) return 0;
+  const d1 = new Date(startDateStr);
+  const d2 = new Date(endDateStr);
+  if (isNaN(d1.getTime()) || isNaN(d2.getTime())) return 0;
+  
+  const diffTime = d2.getTime() - d1.getTime();
+  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays >= 0 ? diffDays : 0;
+};
+
+const calculateOverallProgress = (milestones) => {
+  if (!milestones || !Array.isArray(milestones) || milestones.length === 0) return 0;
+  const totalDays = milestones.reduce((sum, m) => {
+    const d = m.days !== undefined && m.days !== '' && m.days !== null
+      ? Number(m.days)
+      : calculateDaysHelper(m.startDate, m.endDate);
+    return sum + (d > 0 ? d : 0);
+  }, 0);
+
+  if (totalDays <= 0) {
+    const completedWeight = milestones.reduce((acc, m) => m.status === 'Completed' ? acc + (m.percentage || 0) : acc, 0);
+    return Math.min(100, Math.round(completedWeight));
+  }
+
+  const validMilestones = milestones.filter(m => {
+    const d = m.days !== undefined && m.days !== '' && m.days !== null
+      ? Number(m.days)
+      : calculateDaysHelper(m.startDate, m.endDate);
+    return d > 0;
+  });
+
+  const lastValidIdx = validMilestones.length > 0 ? milestones.lastIndexOf(validMilestones[validMilestones.length - 1]) : -1;
+  let accumulated = 0;
+
+  const weighted = milestones.map((m, idx) => {
+    const d = m.days !== undefined && m.days !== '' && m.days !== null
+      ? Number(m.days)
+      : calculateDaysHelper(m.startDate, m.endDate);
+
+    if (d <= 0) return { ...m, pct: 0 };
+
+    if (idx === lastValidIdx) {
+      const remaining = Math.max(0, Math.round((100 - accumulated) * 100) / 100);
+      return { ...m, pct: remaining };
+    } else {
+      const pct = Math.round(((d / totalDays) * 100) * 100) / 100;
+      accumulated += pct;
+      return { ...m, pct: pct };
+    }
+  });
+
+  const totalProgress = weighted.reduce((acc, m) => m.status === 'Completed' ? acc + m.pct : acc, 0);
+  return Math.min(100, Math.round(totalProgress));
+};
+
 
 
 const HEADER_MAP = {
