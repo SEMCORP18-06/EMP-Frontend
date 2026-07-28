@@ -65,8 +65,11 @@ const HEADER_MAP = {
   'projectengineer': 'projectEngineer',
   'engineer': 'projectEngineer',
   'follow-up comments': 'followUpComments',
-  'comments': 'followUpComments',
+  'followup comments': 'followUpComments',
+  'follow up comments': 'followUpComments',
   'followupcomments': 'followUpComments',
+  'comments': 'followUpComments',
+  'comment': 'followUpComments',
   'country code': 'contactCountryCode',
   'countrycode': 'contactCountryCode',
   'contact number': 'contactNumber',
@@ -1184,22 +1187,25 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                               <span className={`status-badge ${getStatusClass(enq.currentStatus)}`} style={{ marginBottom: '6px', display: 'inline-block' }}>
                                 {enq.currentStatus}
                               </span>
-                              {enq.milestones && enq.milestones.length > 0 && (
-                                <div style={{ marginTop: '4px' }}>
-                                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', fontWeight: 'bold', color: 'var(--text-secondary)', marginBottom: '2px' }}>
-                                    <span>Progress</span>
-                                    <span>{enq.milestones.reduce((acc, m) => m.status === 'Completed' ? acc + (m.percentage || 0) : acc, 0)}%</span>
+                              {enq.milestones && enq.milestones.length > 0 && (() => {
+                                const progressPct = calculateOverallProgress(enq.milestones);
+                                return (
+                                  <div style={{ marginTop: '4px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', fontWeight: 'bold', color: 'var(--text-secondary)', marginBottom: '2px' }}>
+                                      <span>Progress</span>
+                                      <span>{progressPct}%</span>
+                                    </div>
+                                    <div style={{ width: '100%', background: 'var(--bg-secondary)', borderRadius: '3px', height: '6px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
+                                      <div style={{ 
+                                        width: `${progressPct}%`, 
+                                        background: 'var(--accent-primary)', 
+                                        height: '100%', 
+                                        borderRadius: '3px' 
+                                      }}></div>
+                                    </div>
                                   </div>
-                                  <div style={{ width: '100%', background: 'var(--bg-secondary)', borderRadius: '3px', height: '6px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
-                                    <div style={{ 
-                                      width: `${enq.milestones.reduce((acc, m) => m.status === 'Completed' ? acc + (m.percentage || 0) : acc, 0)}%`, 
-                                      background: 'var(--accent-primary)', 
-                                      height: '100%', 
-                                      borderRadius: '3px' 
-                                    }}></div>
-                                  </div>
-                                </div>
-                              )}
+                                );
+                              })()}
                             </div>
                           ) : (
                             <span className={`status-badge ${getStatusClass(enq.currentStatus)}`}>
