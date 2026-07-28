@@ -67,6 +67,50 @@ const calculateDays = (startDateStr, endDateStr) => {
   return diffDays >= 0 ? diffDays : '';
 };
 
+const calculateAutoWeights = (list) => {
+  if (!list || !Array.isArray(list) || list.length === 0) return [];
+
+  const totalDays = list.reduce((sum, m) => {
+    const d = m.days !== undefined && m.days !== '' && m.days !== null
+      ? Number(m.days)
+      : (Number(calculateDays(m.startDate, m.endDate)) || 0);
+    return sum + (d > 0 ? d : 0);
+  }, 0);
+
+  if (totalDays <= 0) {
+    return list.map(m => ({ ...m, percentage: 0 }));
+  }
+
+  const validMilestones = list.filter(m => {
+    const d = m.days !== undefined && m.days !== '' && m.days !== null
+      ? Number(m.days)
+      : (Number(calculateDays(m.startDate, m.endDate)) || 0);
+    return d > 0;
+  });
+
+  const lastValidIdx = validMilestones.length > 0 ? list.lastIndexOf(validMilestones[validMilestones.length - 1]) : -1;
+  let accumulated = 0;
+
+  return list.map((m, idx) => {
+    const d = m.days !== undefined && m.days !== '' && m.days !== null
+      ? Number(m.days)
+      : (Number(calculateDays(m.startDate, m.endDate)) || 0);
+
+    if (d <= 0) {
+      return { ...m, percentage: 0 };
+    }
+
+    if (idx === lastValidIdx) {
+      const remaining = Math.max(0, Math.round((100 - accumulated) * 100) / 100);
+      return { ...m, percentage: remaining };
+    } else {
+      const pct = Math.round(((d / totalDays) * 100) * 100) / 100;
+      accumulated += pct;
+      return { ...m, percentage: pct };
+    }
+  });
+};
+
 const getAvatarColor = (name) => {
   const colors = [
     '#6366f1', // Indigo
@@ -166,7 +210,7 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
             remarks: remarksArr
           };
         });
-        setLocalMilestones(normalized);
+        setLocalMilestones(calculateAutoWeights(normalized));
       } else {
         const defaults = DEFAULT_MILESTONES.map(name => ({
           name,
@@ -180,7 +224,7 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
           remarks: [],
           percentage: 0
         }));
-        setLocalMilestones(defaults);
+        setLocalMilestones(calculateAutoWeights(defaults));
       }
     }
   }, [enquiry, isOpen]);
@@ -254,7 +298,12 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
       }
     }
     updated[index] = currentItem;
-    setLocalMilestones(updated);
+    
+    if (field === 'days' || field === 'startDate' || field === 'endDate') {
+      setLocalMilestones(calculateAutoWeights(updated));
+    } else {
+      setLocalMilestones(updated);
+    }
   };
 
   const handleAddRow = () => {
@@ -282,7 +331,7 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
   const confirmDeleteRow = () => {
     if (indexToDelete !== null) {
       const updated = localMilestones.filter((_, idx) => idx !== indexToDelete);
-      setLocalMilestones(updated);
+      setLocalMilestones(calculateAutoWeights(updated));
     }
     setIsDeleteModalOpen(false);
     setIndexToDelete(null);
@@ -317,13 +366,10 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
       alert("Please enter a name for all milestones.");
       return;
     }
-    // Validate that weight percentages sum to exactly 100%
-    const totalWeight = localMilestones.reduce((sum, m) => sum + (Number(m.percentage) || 0), 0);
-    if (totalWeight !== 100) {
-      alert(`The sum of all milestone weights must be exactly 100%. Current sum: ${totalWeight}%`);
-      return;
-    }
-    const mappedMilestones = localMilestones.map(m => ({
+
+    const autoWeightedMilestones = calculateAutoWeights(localMilestones);
+
+    const mappedMilestones = autoWeightedMilestones.map(m => ({
       name: m.name.trim(),
       fpr: m.fpr ? m.fpr.trim() : '',
       startDate: m.startDate || '',
@@ -377,6 +423,13 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
 
   const completedPercentage = localMilestones.reduce((acc, m) => m.status === 'Completed' ? acc + (m.percentage || 0) : acc, 0);
 
+  const totalProjectDays = localMilestones.reduce((sum, m) => {
+    const d = m.days !== undefined && m.days !== '' && m.days !== null
+      ? Number(m.days)
+      : (Number(calculateDays(m.startDate, m.endDate)) || 0);
+    return sum + (d > 0 ? d : 0);
+  }, 0);
+
   return (
     <div className="modal-overlay">
       <div className="modal-content extra-large">
@@ -387,9 +440,12 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
         
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
-            <div className="milestones-modal-subheader" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <div className="milestones-modal-subheader" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
               <div style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-                <strong>Company:</strong> {enquiry?.companyName} | <strong>Client:</strong> {enquiry?.clientName}
+                <strong>Company:</strong> {enquiry?.companyName} | <strong>Client POC:</strong> {enquiry?.clientName}
+              </div>
+              <div style={{ background: 'var(--accent-glow)', padding: '6px 14px', borderRadius: '20px', border: '1px solid var(--accent-primary)', fontSize: '0.88rem', fontWeight: 'bold', color: 'var(--accent-primary)' }}>
+                ⏱️ Total Project Duration: {totalProjectDays} Days
               </div>
             </div>
 
@@ -662,14 +718,12 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
                             </td>
                             <td>
                               <input
-                                type="number"
+                                type="text"
                                 className="form-input table-input"
-                                value={m.percentage !== undefined ? m.percentage : 0}
-                                onChange={(e) => handleFieldChange(idx, 'percentage', parseFloat(e.target.value) || 0)}
-                                placeholder="0"
-                                min="0"
-                                max="100"
-                                style={{ width: '100%', textAlign: 'center' }}
+                                value={`${m.percentage !== undefined ? m.percentage : 0}%`}
+                                readOnly
+                                title="Auto-calculated: (Milestone Days / Total Project Days) * 100"
+                                style={{ width: '100%', textAlign: 'center', fontWeight: 'bold', color: 'var(--accent-primary)', background: 'var(--bg-secondary)', cursor: 'default' }}
                               />
                             </td>
                             <td style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>
