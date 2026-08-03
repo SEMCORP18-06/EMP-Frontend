@@ -831,14 +831,17 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
               remarks: updatedRemarks,
               remark: lastRemarkText
             };
-            setLocalMilestones(updated);
+
+            const autoWeightedMilestones = calculateAutoWeights(updated);
+            setLocalMilestones(autoWeightedMilestones);
 
             // Auto-persist updated remarks immediately to backend so they are never lost on refresh
-            const mappedMilestones = updated.map(m => ({
+            const mappedMilestones = autoWeightedMilestones.map(m => ({
               name: m.name.trim(),
               fpr: m.fpr ? m.fpr.trim() : '',
               startDate: m.startDate || '',
               endDate: m.endDate || '',
+              days: m.days !== undefined && m.days !== '' ? Number(m.days) : (calculateDays(m.startDate, m.endDate) || 0),
               actualEndDate: m.actualEndDate || '',
               status: m.status || 'Pending',
               remark: (m.remarks && m.remarks.length > 0) ? m.remarks[m.remarks.length - 1].text : (m.remark || ''),
@@ -849,7 +852,8 @@ export default function MilestoneModal({ isOpen, isAdmin, isSystemAdmin, onClose
             // Close ONLY the remarks popup
             setActiveRemarksMilestoneIdx(null);
 
-            onSubmit(mappedMilestones, false, true, false);
+            // Save remarks to backend instantly without sending assignment emails or buffering
+            onSubmit(mappedMilestones, false, false, false);
           }}
           currentUsername={username}
           currentDisplayName={displayName}
