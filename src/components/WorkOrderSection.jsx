@@ -5,6 +5,7 @@ import {
   getSalesTeam, 
   getWorkOrderHistory, 
   downloadGeneratedPdf, 
+  deleteWorkOrderHistory,
   getOfferPdfViewUrl 
 } from '../woApi';
 import WoFileUpload from './wo/WoFileUpload';
@@ -25,7 +26,8 @@ import {
   Sparkles,
   RefreshCw,
   Mail,
-  Eye
+  Eye,
+  Trash2
 } from 'lucide-react';
 
 const initialWoState = {
@@ -263,6 +265,18 @@ export default function WorkOrderSection({ token, confirmedEnquiries = [], preSe
     }
   };
 
+  const handleDeleteHistory = async (item) => {
+    if (!window.confirm(`Are you sure you want to delete Work Order ${item.job_no}? This action cannot be undone.`)) {
+      return;
+    }
+    try {
+      await deleteWorkOrderHistory(item.id);
+      setHistoryList(prev => prev.filter(h => h.id !== item.id));
+    } catch (err) {
+      alert(err.message || 'Failed to delete work order entry');
+    }
+  };
+
   // Field stats
   const confidenceFields = ['client_name', 'project_name', 'price_basis', 'freight', 'packing_forwarding', 'payment_terms'];
   let autoCount = 0, confirmCount = 0, manualCount = 0;
@@ -349,6 +363,13 @@ export default function WorkOrderSection({ token, confirmedEnquiries = [], preSe
                           style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', borderRadius: '6px', cursor: 'pointer' }}
                         >
                           <Download size={14} /> Download PDF
+                        </button>
+                        <button 
+                          onClick={() => handleDeleteHistory(item)}
+                          title="Delete Work Order"
+                          style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', borderRadius: '6px', cursor: 'pointer', background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)' }}
+                        >
+                          <Trash2 size={14} /> Delete
                         </button>
                       </div>
                     </td>

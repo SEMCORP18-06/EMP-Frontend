@@ -118,6 +118,17 @@ export async function getNextJobNumber() {
   return data.job_no;
 }
 
+export async function deleteWorkOrderHistory(id) {
+  const res = await fetch(`${WO_API_BASE}/api/work-orders/${id}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Failed to delete entry' }));
+    throw new Error(err.detail || 'Failed to delete entry');
+  }
+  return res.json();
+}
+
 export function getOfferPdfViewUrl(offerPdfUrl) {
   return `${WO_API_BASE}${offerPdfUrl}`;
 }
