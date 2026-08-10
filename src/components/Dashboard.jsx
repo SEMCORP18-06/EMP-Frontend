@@ -1356,17 +1356,8 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                         setPreSelectedEnquiry(enq);
                                         setActiveTab('workorders');
                                       }}
-                                      style={{
-                                        background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-                                        color: '#ffffff',
-                                        border: 'none',
-                                        padding: '4px 8px',
-                                        borderRadius: '6px',
-                                        cursor: 'pointer',
-                                        fontSize: '0.85rem'
-                                      }}
                                     >
-                                      📝 WO
+                                      📝
                                     </button>
                                   </>
                                 )}
@@ -1379,9 +1370,9 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                     setEnquiryForMilestone(enq);
                                     setIsMilestoneModalOpen(true);
                                   }}
-                                  title="Add or Modify Project Milestones"
+                                  title="Milestones"
                                 >
-                                  📋 Milestones
+                                  📋
                                 </button>
                                 <button 
                                   className="action-btn gantt-btn"
@@ -1389,9 +1380,9 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                     setEnquiryForGantt(enq);
                                     setIsGanttModalOpen(true);
                                   }}
-                                  title="View Gantt Chart Timeline"
+                                  title="Gantt Chart Timeline"
                                 >
-                                  📊 Gantt
+                                  📊
                                 </button>
                                 <button 
                                   className="action-btn wo-btn"
@@ -1399,19 +1390,9 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                     setPreSelectedEnquiry(enq);
                                     setActiveTab('workorders');
                                   }}
-                                  title="Generate Work Order for this order"
-                                  style={{
-                                    background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
-                                    color: '#ffffff',
-                                    border: 'none',
-                                    padding: '6px 12px',
-                                    borderRadius: '6px',
-                                    cursor: 'pointer',
-                                    fontSize: '0.8rem',
-                                    fontWeight: '600'
-                                  }}
+                                  title="Generate Work Order"
                                 >
-                                  📝 WO
+                                  📝
                                 </button>
                               </div>
                             )}
