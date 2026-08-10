@@ -24,7 +24,8 @@ import {
   ArrowLeft,
   Sparkles,
   RefreshCw,
-  Mail
+  Mail,
+  Eye
 } from 'lucide-react';
 
 const initialWoState = {
@@ -81,6 +82,8 @@ export default function WorkOrderSection({ token, confirmedEnquiries = [], preSe
   const [downloadUrl, setDownloadUrl] = useState(null);
   const [downloadName, setDownloadName] = useState('');
   const [isMailModalOpen, setIsMailModalOpen] = useState(false);
+  const [previewModalUrl, setPreviewModalUrl] = useState(null);
+  const [previewModalTitle, setPreviewModalTitle] = useState('');
   const [error, setError] = useState(null);
   const [historyList, setHistoryList] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
@@ -214,6 +217,12 @@ export default function WorkOrderSection({ token, confirmedEnquiries = [], preSe
     }
   };
 
+  const handlePreviewHistoryPdf = (item) => {
+    const WO_API_BASE = import.meta.env.VITE_WO_API_BASE || 'http://localhost:8080';
+    setPreviewModalUrl(`${WO_API_BASE}${item.pdf_url}`);
+    setPreviewModalTitle(`Work Order ${item.job_no} - ${item.client_name}`);
+  };
+
   // Field stats
   const confidenceFields = ['client_name', 'project_name', 'price_basis', 'freight', 'packing_forwarding', 'payment_terms'];
   let autoCount = 0, confirmCount = 0, manualCount = 0;
@@ -286,13 +295,22 @@ export default function WorkOrderSection({ token, confirmedEnquiries = [], preSe
                     <td style={{ padding: '1rem' }}>Rev.{item.revision}</td>
                     <td style={{ padding: '1rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{new Date(item.date).toLocaleDateString()}</td>
                     <td style={{ padding: '1rem', textAlign: 'right' }}>
-                      <button 
-                        onClick={() => handleDownloadHistoryPdf(item)}
-                        className="btn-secondary"
-                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', borderRadius: '6px', cursor: 'pointer' }}
-                      >
-                        <Download size={14} /> Download PDF
-                      </button>
+                      <div style={{ display: 'inline-flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                        <button 
+                          onClick={() => handlePreviewHistoryPdf(item)}
+                          className="btn-primary"
+                          style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', borderRadius: '6px', cursor: 'pointer' }}
+                        >
+                          <Eye size={14} /> Preview
+                        </button>
+                        <button 
+                          onClick={() => handleDownloadHistoryPdf(item)}
+                          className="btn-secondary"
+                          style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', borderRadius: '6px', cursor: 'pointer' }}
+                        >
+                          <Download size={14} /> Download PDF
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -305,37 +323,74 @@ export default function WorkOrderSection({ token, confirmedEnquiries = [], preSe
       {/* GENERATOR TAB VIEW */}
       {currentTab === 'generator' && (
         <div>
-          {/* SUCCESS VIEW AFTER GENERATING */}
+          {/* SUCCESS VIEW AFTER GENERATING WITH EMBEDDED PDF PREVIEW */}
           {downloadUrl ? (
-            <div style={{ textAlign: 'center', padding: '3rem', background: 'var(--bg-tertiary)', borderRadius: '16px', border: '1px solid var(--border-color)' }}>
-              <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>🎉</div>
-              <h2 style={{ fontSize: '1.8rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>Work Order Generated Successfully!</h2>
-              <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>Your Work Order PDF is ready to download and saved to history.</p>
-              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                <a 
-                  href={`${import.meta.env.VITE_WO_API_BASE || 'http://localhost:8080'}${downloadUrl}`} 
-                  download={downloadName} 
-                  target="_blank" 
-                  rel="noreferrer"
-                  className="btn-primary" 
-                  style={{ padding: '0.8rem 1.8rem', fontSize: '1rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none', borderRadius: '8px', cursor: 'pointer' }}
-                >
-                  <Download size={20} /> Download Work Order PDF
-                </a>
-                <button 
-                  className="btn-primary" 
-                  style={{ background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)', borderColor: '#0284c7', padding: '0.8rem 1.8rem', fontSize: '1rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', borderRadius: '8px', cursor: 'pointer' }}
-                  onClick={() => setIsMailModalOpen(true)}
-                >
-                  <Mail size={20} /> Send via Email
-                </button>
-                <button 
-                  className="btn-secondary" 
-                  style={{ padding: '0.8rem 1.8rem', borderRadius: '8px', cursor: 'pointer' }} 
-                  onClick={() => { setDownloadUrl(null); setDownloadName(''); }}
-                >
-                  Edit & Regenerate
-                </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+              {/* Success Header & Action Bar */}
+              <div style={{ 
+                background: 'var(--bg-tertiary)', 
+                borderRadius: '14px', 
+                border: '1px solid var(--border-color)', 
+                padding: '1.2rem 1.8rem',
+                display: 'flex',
+                justify: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '1rem'
+              }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                    <span style={{ fontSize: '1.8rem' }}>🎉</span>
+                    <h2 style={{ margin: 0, fontSize: '1.35rem', color: 'var(--text-primary)' }}>Work Order Generated Successfully!</h2>
+                  </div>
+                  <p style={{ margin: '0.3rem 0 0 2.4rem', color: 'var(--text-secondary)', fontSize: '0.88rem' }}>
+                    Job No: <strong style={{ color: 'var(--accent-primary, #6366f1)' }}>{state.job_no}</strong> | Scroll below to preview the complete PDF document.
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <a 
+                    href={`${import.meta.env.VITE_WO_API_BASE || 'http://localhost:8080'}${downloadUrl}`} 
+                    download={downloadName} 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="btn-primary" 
+                    style={{ padding: '0.6rem 1.3rem', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', textDecoration: 'none', borderRadius: '8px', cursor: 'pointer' }}
+                  >
+                    <Download size={18} /> Download PDF
+                  </a>
+                  <button 
+                    className="btn-primary" 
+                    style={{ background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)', borderColor: '#0284c7', padding: '0.6rem 1.3rem', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', borderRadius: '8px', cursor: 'pointer' }}
+                    onClick={() => setIsMailModalOpen(true)}
+                  >
+                    <Mail size={18} /> Send via Email
+                  </button>
+                  <button 
+                    className="btn-secondary" 
+                    style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem', borderRadius: '8px', cursor: 'pointer' }} 
+                    onClick={() => { setDownloadUrl(null); setDownloadName(''); }}
+                  >
+                    ✏️ Edit & Regenerate
+                  </button>
+                </div>
+              </div>
+
+              {/* Embedded PDF Viewer Container */}
+              <div style={{ 
+                background: 'var(--bg-tertiary)', 
+                borderRadius: '14px', 
+                border: '1px solid var(--border-color)', 
+                overflow: 'hidden', 
+                height: '800px', 
+                boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
+                position: 'relative'
+              }}>
+                <iframe 
+                  src={`${import.meta.env.VITE_WO_API_BASE || 'http://localhost:8080'}${downloadUrl}`} 
+                  title="Generated Work Order PDF Preview"
+                  style={{ width: '100%', height: '100%', border: 'none' }}
+                />
               </div>
             </div>
           ) : step === 'upload' ? (
@@ -594,6 +649,27 @@ export default function WorkOrderSection({ token, confirmedEnquiries = [], preSe
         downloadUrl={downloadUrl}
         token={token}
       />
+
+      {/* PDF Preview Modal for History Items */}
+      {previewModalUrl && (
+        <div className="modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100, padding: '1.5rem' }}>
+          <div style={{ background: 'var(--bg-secondary)', borderRadius: '16px', border: '1px solid var(--border-color)', width: '90vw', height: '90vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' }}>
+            <div style={{ padding: '1rem 1.5rem', background: 'var(--bg-tertiary)', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <FileText size={18} color="var(--accent-primary, #6366f1)" /> {previewModalTitle || 'Work Order PDF Preview'}
+              </h3>
+              <button onClick={() => setPreviewModalUrl(null)} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.4rem' }}>✕</button>
+            </div>
+            <div style={{ flex: 1, position: 'relative' }}>
+              <iframe 
+                src={previewModalUrl} 
+                title="Work Order PDF Preview Modal" 
+                style={{ width: '100%', height: '100%', border: 'none' }} 
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
