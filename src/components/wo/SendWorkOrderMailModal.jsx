@@ -100,6 +100,37 @@ export default function SendWorkOrderMailModal({ isOpen, onClose, woData, downlo
     setSuccessMsg('');
 
     try {
+      const WO_API_BASE = import.meta.env.VITE_WO_API_BASE || 'http://localhost:8080';
+      let attachmentObj = null;
+
+      if (downloadUrl) {
+        try {
+          const fullPdfUrl = downloadUrl.startsWith('http') ? downloadUrl : `${WO_API_BASE}${downloadUrl}`;
+          const pdfRes = await fetch(fullPdfUrl);
+          if (pdfRes.ok) {
+            const pdfBlob = await pdfRes.blob();
+            const base64Data = await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                const resultStr = reader.result || '';
+                const base64 = resultStr.includes(',') ? resultStr.split(',')[1] : resultStr;
+                resolve(base64);
+              };
+              reader.onerror = reject;
+              reader.readAsDataURL(pdfBlob);
+            });
+            if (base64Data) {
+              attachmentObj = {
+                filename: filename,
+                data: base64Data
+              };
+            }
+          }
+        } catch (pdfErr) {
+          console.warn('Could not convert PDF to Base64 on client, falling back to pdfUrl:', pdfErr);
+        }
+      }
+
       const API_BASE = import.meta.env.VITE_API_BASE || 'https://emp-backend-amber.vercel.app/api';
       const res = await fetch(`${API_BASE}/send-workorder-email`, {
         method: 'POST',
@@ -113,7 +144,8 @@ export default function SendWorkOrderMailModal({ isOpen, onClose, woData, downlo
           subject: subject.trim(),
           message: message.trim(),
           pdfUrl: downloadUrl,
-          filename: filename
+          filename: filename,
+          attachment: attachmentObj
         })
       });
 
