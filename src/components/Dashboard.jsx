@@ -8,6 +8,7 @@ import DashboardAnalytics from './DashboardAnalytics';
 import UserManagementPanel from './UserManagementPanel';
 import GanttModal from './GanttModal';
 import SendMailModal from './SendMailModal';
+import WorkOrderSection from './WorkOrderSection';
 import { API_BASE } from '../config';
 
 const calculateDaysHelper = (startDateStr, endDateStr) => {
@@ -393,7 +394,8 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
   const [error, setError] = useState('');
   
   // Navigation tab state
-  const [activeTab, setActiveTab] = useState('enquiries'); // 'enquiries', 'milestones' or 'analytics'
+  const [activeTab, setActiveTab] = useState('enquiries'); // 'enquiries', 'milestones', 'analytics' or 'workorders'
+  const [preSelectedEnquiry, setPreSelectedEnquiry] = useState(null);
   
   // Search & Filter state
   const [searchTerm, setSearchTerm] = useState('');
@@ -888,6 +890,22 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
           >
             Dashboard
           </button>
+          <button 
+            className={`nav-link ${activeTab === 'workorders' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab('workorders');
+              setPreSelectedEnquiry(null);
+              setSearchTerm('');
+              setStatusFilter('');
+              setStartDateFilter('');
+              setEndDateFilter('');
+              setShowDateDropdown(false);
+              setShowStatusDropdown(false);
+              setMobileNavOpen(false);
+            }}
+          >
+            Work Orders
+          </button>
         </nav>
 
         <div className="user-profile">
@@ -913,7 +931,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
         {/* Title Bar */}
         <div className="dashboard-title-bar">
           <h2 className="dashboard-title">
-            {activeTab === 'analytics' ? 'Analytics Dashboard' : activeTab === 'enquiries' ? 'Enquiries Database' : activeTab === 'users' ? 'User Management' : 'Confirmed Orders'}
+            {activeTab === 'analytics' ? 'Analytics Dashboard' : activeTab === 'workorders' ? 'Work Order Generation' : activeTab === 'enquiries' ? 'Enquiries Database' : activeTab === 'users' ? 'User Management' : 'Confirmed Orders'}
           </h2>
           {(activeTab === 'enquiries' || activeTab === 'users') && (
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
@@ -1012,11 +1030,18 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
           </div>
         )}
 
-        {/* Analytics or Table Card */}
+        {/* Analytics, Users, Work Orders, or Table Card */}
         {activeTab === 'analytics' ? (
           <DashboardAnalytics enquiries={enquiries} />
         ) : activeTab === 'users' ? (
           <UserManagementPanel token={token} currentUsername={username} />
+        ) : activeTab === 'workorders' ? (
+          <WorkOrderSection 
+            token={token}
+            confirmedEnquiries={enquiries.filter(e => e.currentStatus === 'Confirmed')}
+            preSelectedEnquiry={preSelectedEnquiry}
+            onClearPreSelected={() => setPreSelectedEnquiry(null)}
+          />
         ) : (
           <div className="table-card">
             {error && <div style={{ padding: '24px', color: '#fca5a5' }}>{error}</div>}
@@ -1313,16 +1338,37 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                   🗑️
                                 </button>
                                 {enq.currentStatus === 'Confirmed' && (
-                                  <button 
-                                    className="action-btn mail-btn"
-                                    title="Send Email to Client"
-                                    onClick={() => {
-                                      setEnquiryForCustomMail(enq);
-                                      setIsSendMailModalOpen(true);
-                                    }}
-                                  >
-                                    📧
-                                  </button>
+                                  <>
+                                    <button 
+                                      className="action-btn mail-btn"
+                                      title="Send Email to Client"
+                                      onClick={() => {
+                                        setEnquiryForCustomMail(enq);
+                                        setIsSendMailModalOpen(true);
+                                      }}
+                                    >
+                                      📧
+                                    </button>
+                                    <button 
+                                      className="action-btn wo-btn"
+                                      title="Generate Work Order"
+                                      onClick={() => {
+                                        setPreSelectedEnquiry(enq);
+                                        setActiveTab('workorders');
+                                      }}
+                                      style={{
+                                        background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+                                        color: '#ffffff',
+                                        border: 'none',
+                                        padding: '4px 8px',
+                                        borderRadius: '6px',
+                                        cursor: 'pointer',
+                                        fontSize: '0.85rem'
+                                      }}
+                                    >
+                                      📝 WO
+                                    </button>
+                                  </>
                                 )}
                               </>
                             ) : (
@@ -1346,6 +1392,26 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                   title="View Gantt Chart Timeline"
                                 >
                                   📊 Gantt
+                                </button>
+                                <button 
+                                  className="action-btn wo-btn"
+                                  onClick={() => {
+                                    setPreSelectedEnquiry(enq);
+                                    setActiveTab('workorders');
+                                  }}
+                                  title="Generate Work Order for this order"
+                                  style={{
+                                    background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+                                    color: '#ffffff',
+                                    border: 'none',
+                                    padding: '6px 12px',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer',
+                                    fontSize: '0.8rem',
+                                    fontWeight: '600'
+                                  }}
+                                >
+                                  📝 WO
                                 </button>
                               </div>
                             )}

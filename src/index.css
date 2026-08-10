@@ -5915,3 +5915,58 @@ h1, h2, h3, h4, h5, h6 {
     scrollbar-width: none;
   }
 }
+
+/* Work Order Tab Styles */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+.confidence-high {
+  border-left: 3px solid var(--success-green, #22c55e) !important;
+}
+
+.confidence-must_confirm {
+  border-left: 3px solid var(--warning-amber, #f59e0b) !important;
+}
+
+.confidence-derived {
+  border-left: 3px solid var(--accent-primary, #6366f1) !important;
+}
+
+.confidence-manual {
+  border-left: 3px solid var(--error-red, #ef4444) !important;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: #ffffff;
+  border: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+}
+
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
+}
+
+.btn-secondary {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  border-color: var(--accent-primary, #6366f1);
+  color: var(--accent-primary, #6366f1);
+}
+
