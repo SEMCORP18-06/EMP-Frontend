@@ -119,17 +119,6 @@ export default function WorkOrderSection({ token, confirmedEnquiries = [], preSe
     getSalesTeam().then(list => setSalesTeamList(list)).catch(() => {});
   }, []);
 
-  // Fetch history when history tab active
-  useEffect(() => {
-    if (currentTab === 'history') {
-      setLoadingHistory(true);
-      getWorkOrderHistory()
-        .then(data => setHistoryList(data))
-        .catch(err => setError('Failed to load work order history'))
-        .finally(() => setLoadingHistory(false));
-    }
-  }, [currentTab]);
-
   // Handle pre-selected enquiry from Confirmed Orders tab
   useEffect(() => {
     if (preSelectedEnquiry) {
