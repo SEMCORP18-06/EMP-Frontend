@@ -10,6 +10,7 @@ import GanttModal from './GanttModal';
 import SendMailModal from './SendMailModal';
 import WorkOrderSection from './WorkOrderSection';
 import { API_BASE } from '../config';
+import { ClipboardList, BarChart3, FileText, Mail, Pencil, Trash2 } from 'lucide-react';
 
 const calculateDaysHelper = (startDateStr, endDateStr) => {
   if (!startDateStr || !endDateStr) return 0;
@@ -1325,7 +1326,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                     setIsEnquiryModalOpen(true);
                                   }}
                                 >
-                                  ✏️
+                                  <Pencil size={15} />
                                 </button>
                                 <button 
                                   className="action-btn delete"
@@ -1335,7 +1336,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                     setIsDeleteModalOpen(true);
                                   }}
                                 >
-                                  🗑️
+                                  <Trash2 size={15} />
                                 </button>
                                 {enq.currentStatus === 'Confirmed' && (
                                   <>
@@ -1347,7 +1348,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                         setIsSendMailModalOpen(true);
                                       }}
                                     >
-                                      📧
+                                      <Mail size={15} />
                                     </button>
                                     <button 
                                       className="action-btn wo-btn"
@@ -1357,7 +1358,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                         setActiveTab('workorders');
                                       }}
                                     >
-                                      📝
+                                      <FileText size={15} />
                                     </button>
                                   </>
                                 )}
@@ -1372,7 +1373,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                   }}
                                   title="Milestones"
                                 >
-                                  📋
+                                  <ClipboardList size={16} />
                                 </button>
                                 <button 
                                   className="action-btn gantt-btn"
@@ -1382,7 +1383,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                   }}
                                   title="Gantt Chart Timeline"
                                 >
-                                  📊
+                                  <BarChart3 size={16} />
                                 </button>
                                 <button 
                                   className="action-btn wo-btn"
@@ -1392,7 +1393,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                   }}
                                   title="Generate Work Order"
                                 >
-                                  📝
+                                  <FileText size={16} />
                                 </button>
                               </div>
                             )}
