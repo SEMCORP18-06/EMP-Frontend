@@ -12,6 +12,7 @@ import EditableField from './wo/EditableField';
 import EquipmentAccordion from './wo/EquipmentAccordion';
 import EditableTable from './wo/EditableTable';
 import EditableBulletList from './wo/EditableBulletList';
+import SendWorkOrderMailModal from './wo/SendWorkOrderMailModal';
 import { 
   CheckCircle, 
   AlertTriangle, 
@@ -22,7 +23,8 @@ import {
   FileText, 
   ArrowLeft,
   Sparkles,
-  RefreshCw
+  RefreshCw,
+  Mail
 } from 'lucide-react';
 
 const initialWoState = {
@@ -68,7 +70,7 @@ function woReducer(state, action) {
   }
 }
 
-export default function WorkOrderSection({ confirmedEnquiries = [], preSelectedEnquiry = null, onClearPreSelected }) {
+export default function WorkOrderSection({ token, confirmedEnquiries = [], preSelectedEnquiry = null, onClearPreSelected }) {
   const [currentTab, setCurrentTab] = useState('generator'); // 'generator' | 'history'
   const [state, dispatch] = useReducer(woReducer, initialWoState);
   const [offerPdfUrl, setOfferPdfUrl] = useState(null);
@@ -78,6 +80,7 @@ export default function WorkOrderSection({ confirmedEnquiries = [], preSelectedE
   const [confirmedFields, setConfirmedFields] = useState(new Set());
   const [downloadUrl, setDownloadUrl] = useState(null);
   const [downloadName, setDownloadName] = useState('');
+  const [isMailModalOpen, setIsMailModalOpen] = useState(false);
   const [error, setError] = useState(null);
   const [historyList, setHistoryList] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
@@ -319,6 +322,13 @@ export default function WorkOrderSection({ confirmedEnquiries = [], preSelectedE
                 >
                   <Download size={20} /> Download Work Order PDF
                 </a>
+                <button 
+                  className="btn-primary" 
+                  style={{ background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)', borderColor: '#0284c7', padding: '0.8rem 1.8rem', fontSize: '1rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', borderRadius: '8px', cursor: 'pointer' }}
+                  onClick={() => setIsMailModalOpen(true)}
+                >
+                  <Mail size={20} /> Send via Email
+                </button>
                 <button 
                   className="btn-secondary" 
                   style={{ padding: '0.8rem 1.8rem', borderRadius: '8px', cursor: 'pointer' }} 
@@ -587,6 +597,14 @@ export default function WorkOrderSection({ confirmedEnquiries = [], preSelectedE
           )}
         </div>
       )}
+      {/* Email Work Order Modal */}
+      <SendWorkOrderMailModal 
+        isOpen={isMailModalOpen}
+        onClose={() => setIsMailModalOpen(false)}
+        woData={state}
+        downloadUrl={downloadUrl}
+        token={token}
+      />
     </div>
   );
 }
