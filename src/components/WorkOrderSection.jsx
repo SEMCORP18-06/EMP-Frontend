@@ -566,22 +566,11 @@ export default function WorkOrderSection({ token, confirmedEnquiries = [], preSe
                 background: 'var(--bg-secondary)',
                 borderTop: '1px solid var(--border-color)',
                 display: 'flex',
-                justify: 'space-between',
+                justifyContent: 'flex-end',
                 alignItems: 'center',
+                gap: '1.5rem',
                 zIndex: 90
               }}>
-                <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: 'var(--success-green, #22c55e)', fontSize: '0.85rem' }}>
-                    <CheckCircle size={14} /> {autoCount} Auto-filled
-                  </span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: 'var(--warning-amber, #f59e0b)', fontSize: '0.85rem' }}>
-                    <AlertTriangle size={14} /> {confirmCount} Must Confirm
-                  </span>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: 'var(--error-red, #ef4444)', fontSize: '0.85rem' }}>
-                    <Edit3 size={14} /> {manualCount} Manual
-                  </span>
-                </div>
-
                 {error && <span style={{ color: 'var(--error-red, #ef4444)', fontSize: '0.85rem' }}>{error}</span>}
 
                 <button 
