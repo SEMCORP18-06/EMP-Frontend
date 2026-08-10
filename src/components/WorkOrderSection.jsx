@@ -254,15 +254,23 @@ export default function WorkOrderSection({ token, confirmedEnquiries = [], preSe
   };
 
   const handlePreviewHistoryPdf = async (item) => {
+    const WO_API_BASE = import.meta.env.VITE_WO_API_BASE || 'http://localhost:8080';
+    const fullUrl = item.pdf_url.startsWith('http') ? item.pdf_url : `${WO_API_BASE}${item.pdf_url}`;
+    setPreviewModalTitle(`Work Order ${item.job_no} - ${item.client_name}`);
+
     try {
-      setPreviewModalTitle(`Work Order ${item.job_no} - ${item.client_name}`);
-      const blob = await downloadGeneratedPdf(item.pdf_url);
-      const pdfBlob = new Blob([blob], { type: 'application/pdf' });
-      const objectUrl = URL.createObjectURL(pdfBlob);
-      setPreviewModalUrl(objectUrl);
+      const res = await fetch(fullUrl);
+      if (res.ok) {
+        const blob = await res.blob();
+        const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+        const objectUrl = URL.createObjectURL(pdfBlob);
+        setPreviewModalUrl(objectUrl);
+        return;
+      }
     } catch (err) {
-      alert('Failed to load PDF preview');
+      console.warn('Direct blob fetch preview failed, fallback to fullUrl:', err);
     }
+    setPreviewModalUrl(fullUrl);
   };
 
   const handleDeleteHistory = async (item) => {
@@ -337,7 +345,7 @@ export default function WorkOrderSection({ token, confirmedEnquiries = [], preSe
                   <th style={{ padding: '1rem' }}>Project Name</th>
                   <th style={{ padding: '1rem' }}>Rev</th>
                   <th style={{ padding: '1rem' }}>Date Generated</th>
-                  <th style={{ padding: '1rem', textAlign: 'right' }}>Action</th>
+                  <th style={{ padding: '1rem', textAlign: 'right', minWidth: '320px' }}>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -348,26 +356,29 @@ export default function WorkOrderSection({ token, confirmedEnquiries = [], preSe
                     <td style={{ padding: '1rem' }}>{item.project_name}</td>
                     <td style={{ padding: '1rem' }}>Rev.{item.revision}</td>
                     <td style={{ padding: '1rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{new Date(item.date).toLocaleDateString()}</td>
-                    <td style={{ padding: '1rem', textAlign: 'right' }}>
-                      <div style={{ display: 'inline-flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                    <td style={{ padding: '1rem', textAlign: 'right', whiteSpace: 'nowrap' }}>
+                      <div style={{ display: 'inline-flex', gap: '0.5rem', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'nowrap' }}>
                         <button 
                           onClick={() => handlePreviewHistoryPdf(item)}
                           className="btn-primary"
-                          style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', borderRadius: '6px', cursor: 'pointer' }}
+                          style={{ padding: '0.45rem 0.85rem', fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', borderRadius: '6px', cursor: 'pointer', whiteSpace: 'nowrap', height: '34px', lineHeight: 1 }}
                         >
                           <Eye size={14} /> Preview
                         </button>
-                        <button 
-                          onClick={() => handleDownloadHistoryPdf(item)}
+                        <a 
+                          href={`${import.meta.env.VITE_WO_API_BASE || 'http://localhost:8080'}${item.pdf_url}`}
+                          download={`${item.job_no}_WorkOrder.pdf`}
+                          target="_blank"
+                          rel="noreferrer"
                           className="btn-secondary"
-                          style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', borderRadius: '6px', cursor: 'pointer' }}
+                          style={{ padding: '0.45rem 0.85rem', fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', borderRadius: '6px', cursor: 'pointer', whiteSpace: 'nowrap', textDecoration: 'none', height: '34px', lineHeight: 1, color: 'var(--text-primary)', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}
                         >
                           <Download size={14} /> Download PDF
-                        </button>
+                        </a>
                         <button 
                           onClick={() => handleDeleteHistory(item)}
                           title="Delete Work Order"
-                          style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', borderRadius: '6px', cursor: 'pointer', background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)' }}
+                          style={{ padding: '0.45rem 0.85rem', fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', borderRadius: '6px', cursor: 'pointer', whiteSpace: 'nowrap', height: '34px', lineHeight: 1, background: 'rgba(239, 68, 68, 0.12)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)' }}
                         >
                           <Trash2 size={14} /> Delete
                         </button>
