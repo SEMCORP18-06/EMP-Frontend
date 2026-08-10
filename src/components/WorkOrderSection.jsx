@@ -102,7 +102,7 @@ export default function WorkOrderSection({ confirmedEnquiries = [], preSelectedE
   // Handle pre-selected enquiry from Confirmed Orders tab
   useEffect(() => {
     if (preSelectedEnquiry) {
-      setStep('review');
+      setStep('upload'); // Keep on upload step so user can upload Offer PDF!
       dispatch({
         type: 'SET_DATA',
         data: {
@@ -134,11 +134,45 @@ export default function WorkOrderSection({ confirmedEnquiries = [], preSelectedE
     setUploading(true);
     setError(null);
     try {
-      const data = await uploadOffer(file);
-      if (data.offer_pdf_url) {
-        setOfferPdfUrl(data.offer_pdf_url);
+      const extracted = await uploadOffer(file);
+      if (extracted.offer_pdf_url) {
+        setOfferPdfUrl(extracted.offer_pdf_url);
       }
-      dispatch({ type: 'SET_DATA', data });
+      
+      // Merge extracted PDF data with pre-selected enquiry details if available
+      let merged = { ...extracted };
+      if (preSelectedEnquiry) {
+        if (preSelectedEnquiry.companyName || preSelectedEnquiry.clientName) {
+          merged.client_name = {
+            value: preSelectedEnquiry.companyName || preSelectedEnquiry.clientName,
+            confidence: 'high',
+            source: 'enquiry_portal'
+          };
+        }
+        if (preSelectedEnquiry.poNumber) {
+          merged.po_no = preSelectedEnquiry.poNumber;
+        }
+        if (preSelectedEnquiry.projectNumber) {
+          merged.project_name = {
+            value: `Project ${preSelectedEnquiry.projectNumber}`,
+            confidence: 'high',
+            source: 'enquiry_portal'
+          };
+        }
+        if (preSelectedEnquiry.projectEngineer || preSelectedEnquiry.fpr) {
+          merged.sales_person = preSelectedEnquiry.projectEngineer || preSelectedEnquiry.fpr;
+        }
+        if (preSelectedEnquiry.expectedDateOfDispatch) {
+          merged.delivery_period = merged.delivery_period 
+            ? `${merged.delivery_period} (Dispatch expected: ${preSelectedEnquiry.expectedDateOfDispatch})`
+            : `Dispatch expected by ${preSelectedEnquiry.expectedDateOfDispatch}`;
+        }
+        if (preSelectedEnquiry.enquiryDetails && !merged.system_overview) {
+          merged.system_overview = preSelectedEnquiry.enquiryDetails;
+        }
+      }
+
+      dispatch({ type: 'SET_DATA', data: merged });
       setStep('review');
     } catch (err) {
       setError(err.message || 'Failed to extract data from Offer PDF');
@@ -296,13 +330,29 @@ export default function WorkOrderSection({ confirmedEnquiries = [], preSelectedE
             </div>
           ) : step === 'upload' ? (
             /* UPLOAD STEP */
-            <div style={{ maxWidth: '700px', margin: '2rem auto' }}>
-              <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                <h2 style={{ fontSize: '1.6rem', marginBottom: '0.5rem' }}>Upload Offer PDF</h2>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
-                  Upload the client offer/quotation PDF. Gemini AI will automatically extract equipment tables, scope of supply, and commercial terms.
-                </p>
-              </div>
+            <div style={{ maxWidth: '750px', margin: '1.5rem auto' }}>
+              {preSelectedEnquiry ? (
+                <div style={{ background: 'rgba(99, 102, 241, 0.12)', border: '1px solid var(--accent-primary)', padding: '1.2rem 1.5rem', borderRadius: '14px', marginBottom: '1.5rem', textAlign: 'left' }}>
+                  <h4 style={{ margin: 0, color: 'var(--accent-primary)', fontSize: '1.05rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    📋 Selected Order: <strong>{preSelectedEnquiry.companyName || preSelectedEnquiry.clientName}</strong>
+                  </h4>
+                  <div style={{ margin: '0.5rem 0 0', fontSize: '0.88rem', color: 'var(--text-secondary)', display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+                    <span>PO No: <strong style={{ color: 'var(--text-primary)' }}>{preSelectedEnquiry.poNumber || 'N/A'}</strong></span>
+                    <span>Project No: <strong style={{ color: 'var(--text-primary)' }}>{preSelectedEnquiry.projectNumber || 'N/A'}</strong></span>
+                    <span>Engineer: <strong style={{ color: 'var(--text-primary)' }}>{preSelectedEnquiry.projectEngineer || preSelectedEnquiry.fpr || 'N/A'}</strong></span>
+                  </div>
+                  <p style={{ margin: '0.6rem 0 0', fontSize: '0.88rem', color: 'var(--text-primary)' }}>
+                    👇 <strong>Upload the Offer PDF below</strong> for this order. AI will extract equipment tables & scope, merging them with the enquiry details above.
+                  </p>
+                </div>
+              ) : (
+                <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                  <h2 style={{ fontSize: '1.6rem', marginBottom: '0.5rem' }}>Upload Offer PDF</h2>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
+                    Upload the client offer/quotation PDF. Gemini AI will automatically extract equipment tables, scope of supply, and commercial terms.
+                  </p>
+                </div>
+              )}
 
               {uploading ? (
                 <div style={{ textAlign: 'center', padding: '3rem', background: 'var(--bg-tertiary)', borderRadius: '16px', border: '1px solid var(--border-color)' }}>
@@ -316,13 +366,13 @@ export default function WorkOrderSection({ confirmedEnquiries = [], preSelectedE
                   
                   {preSelectedEnquiry && (
                     <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
-                      <p style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Or proceed directly with pre-filled enquiry data:</p>
+                      <p style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem', fontSize: '0.9rem' }}>Don't have an Offer PDF right now?</p>
                       <button 
                         className="btn-secondary" 
                         onClick={() => setStep('review')}
                         style={{ padding: '0.6rem 1.2rem', borderRadius: '8px', cursor: 'pointer' }}
                       >
-                        Skip Upload & Use Enquiry Data →
+                        Skip Upload & Use Enquiry Details Only →
                       </button>
                     </div>
                   )}
