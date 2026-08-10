@@ -84,10 +84,44 @@ export default function WorkOrderSection({ token, confirmedEnquiries = [], preSe
   const [isMailModalOpen, setIsMailModalOpen] = useState(false);
   const [previewModalUrl, setPreviewModalUrl] = useState(null);
   const [previewModalTitle, setPreviewModalTitle] = useState('');
+  const [pdfBlobUrl, setPdfBlobUrl] = useState(null);
+  const [loadingPdfBlob, setLoadingPdfBlob] = useState(false);
   const [error, setError] = useState(null);
   const [historyList, setHistoryList] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [step, setStep] = useState('upload'); // 'upload' | 'review'
+
+  // Fetch PDF Blob for preview when downloadUrl changes
+  useEffect(() => {
+    if (!downloadUrl) {
+      setPdfBlobUrl(null);
+      return;
+    }
+
+    setLoadingPdfBlob(true);
+    let objectUrl = null;
+    const WO_API_BASE = import.meta.env.VITE_WO_API_BASE || 'http://localhost:8080';
+    const fullUrl = downloadUrl.startsWith('http') ? downloadUrl : `${WO_API_BASE}${downloadUrl}`;
+
+    fetch(fullUrl)
+      .then(res => res.blob())
+      .then(blob => {
+        const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+        objectUrl = URL.createObjectURL(pdfBlob);
+        setPdfBlobUrl(objectUrl);
+      })
+      .catch(err => {
+        console.warn('Fallback to direct URL for PDF preview:', err);
+        setPdfBlobUrl(fullUrl);
+      })
+      .finally(() => {
+        setLoadingPdfBlob(false);
+      });
+
+    return () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [downloadUrl]);
 
   // Fetch sales team list
   useEffect(() => {
@@ -217,10 +251,16 @@ export default function WorkOrderSection({ token, confirmedEnquiries = [], preSe
     }
   };
 
-  const handlePreviewHistoryPdf = (item) => {
-    const WO_API_BASE = import.meta.env.VITE_WO_API_BASE || 'http://localhost:8080';
-    setPreviewModalUrl(`${WO_API_BASE}${item.pdf_url}`);
-    setPreviewModalTitle(`Work Order ${item.job_no} - ${item.client_name}`);
+  const handlePreviewHistoryPdf = async (item) => {
+    try {
+      setPreviewModalTitle(`Work Order ${item.job_no} - ${item.client_name}`);
+      const blob = await downloadGeneratedPdf(item.pdf_url);
+      const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+      const objectUrl = URL.createObjectURL(pdfBlob);
+      setPreviewModalUrl(objectUrl);
+    } catch (err) {
+      alert('Failed to load PDF preview');
+    }
   };
 
   // Field stats
@@ -386,11 +426,42 @@ export default function WorkOrderSection({ token, confirmedEnquiries = [], preSe
                 boxShadow: '0 10px 30px rgba(0,0,0,0.3)',
                 position: 'relative'
               }}>
-                <iframe 
-                  src={`${import.meta.env.VITE_WO_API_BASE || 'http://localhost:8080'}${downloadUrl}`} 
-                  title="Generated Work Order PDF Preview"
-                  style={{ width: '100%', height: '100%', border: 'none' }}
-                />
+                {loadingPdfBlob ? (
+                  <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)', gap: '0.6rem' }}>
+                    <RefreshCw className="spin" size={20} /> Loading Work Order PDF Preview...
+                  </div>
+                ) : pdfBlobUrl ? (
+                  <object 
+                    data={pdfBlobUrl} 
+                    type="application/pdf" 
+                    width="100%" 
+                    height="100%" 
+                    style={{ border: 'none' }}
+                  >
+                    <iframe 
+                      src={pdfBlobUrl} 
+                      title="Generated Work Order PDF Preview"
+                      style={{ width: '100%', height: '100%', border: 'none' }}
+                    >
+                      <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                        <p style={{ marginBottom: '1rem' }}>Your browser preview is disabled or doesn't support embedded PDFs directly.</p>
+                        <a 
+                          href={pdfBlobUrl} 
+                          target="_blank" 
+                          rel="noreferrer" 
+                          className="btn-primary" 
+                          style={{ padding: '0.6rem 1.2rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}
+                        >
+                          <Eye size={16} /> Open PDF Preview in New Tab
+                        </a>
+                      </div>
+                    </iframe>
+                  </object>
+                ) : (
+                  <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: 'var(--text-secondary)' }}>
+                    Preparing PDF Preview...
+                  </div>
+                )}
               </div>
             </div>
           ) : step === 'upload' ? (
@@ -661,11 +732,19 @@ export default function WorkOrderSection({ token, confirmedEnquiries = [], preSe
               <button onClick={() => setPreviewModalUrl(null)} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.4rem' }}>✕</button>
             </div>
             <div style={{ flex: 1, position: 'relative' }}>
-              <iframe 
-                src={previewModalUrl} 
-                title="Work Order PDF Preview Modal" 
-                style={{ width: '100%', height: '100%', border: 'none' }} 
-              />
+              <object 
+                data={previewModalUrl} 
+                type="application/pdf" 
+                width="100%" 
+                height="100%" 
+                style={{ border: 'none' }}
+              >
+                <iframe 
+                  src={previewModalUrl} 
+                  title="Work Order PDF Preview Modal" 
+                  style={{ width: '100%', height: '100%', border: 'none' }} 
+                />
+              </object>
             </div>
           </div>
         </div>
