@@ -1,11 +1,7 @@
-import React, { useState, useEffect, useReducer } from 'react';
 import { 
   uploadOffer, 
   generateWorkOrder, 
   getSalesTeam, 
-  getWorkOrderHistory, 
-  downloadGeneratedPdf, 
-  deleteWorkOrderHistory,
   getOfferPdfViewUrl 
 } from '../woApi';
 import WoFileUpload from './wo/WoFileUpload';
@@ -20,14 +16,11 @@ import {
   Edit3, 
   Download, 
   Plus, 
-  History, 
   FileText, 
   ArrowLeft,
   Sparkles,
   RefreshCw,
-  Mail,
-  Eye,
-  Trash2
+  Mail
 } from 'lucide-react';
 
 const initialWoState = {
@@ -74,7 +67,6 @@ function woReducer(state, action) {
 }
 
 export default function WorkOrderSection({ token, confirmedEnquiries = [], preSelectedEnquiry = null, onClearPreSelected }) {
-  const [currentTab, setCurrentTab] = useState('generator'); // 'generator' | 'history'
   const [state, dispatch] = useReducer(woReducer, initialWoState);
   const [offerPdfUrl, setOfferPdfUrl] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -84,13 +76,9 @@ export default function WorkOrderSection({ token, confirmedEnquiries = [], preSe
   const [downloadUrl, setDownloadUrl] = useState(null);
   const [downloadName, setDownloadName] = useState('');
   const [isMailModalOpen, setIsMailModalOpen] = useState(false);
-  const [previewModalUrl, setPreviewModalUrl] = useState(null);
-  const [previewModalTitle, setPreviewModalTitle] = useState('');
   const [pdfBlobUrl, setPdfBlobUrl] = useState(null);
   const [loadingPdfBlob, setLoadingPdfBlob] = useState(false);
   const [error, setError] = useState(null);
-  const [historyList, setHistoryList] = useState([]);
-  const [loadingHistory, setLoadingHistory] = useState(false);
   const [step, setStep] = useState('upload'); // 'upload' | 'review'
 
   // Fetch PDF Blob for preview when downloadUrl changes
@@ -237,54 +225,6 @@ export default function WorkOrderSection({ token, confirmedEnquiries = [], preSe
     }
   };
 
-  const handleDownloadHistoryPdf = async (item) => {
-    try {
-      const blob = await downloadGeneratedPdf(item.pdf_url);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${item.job_no}_WorkOrder.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      alert('Failed to download PDF');
-    }
-  };
-
-  const handlePreviewHistoryPdf = async (item) => {
-    const WO_API_BASE = import.meta.env.VITE_WO_API_BASE || 'http://localhost:8080';
-    const fullUrl = item.pdf_url.startsWith('http') ? item.pdf_url : `${WO_API_BASE}${item.pdf_url}`;
-    setPreviewModalTitle(`Work Order ${item.job_no} - ${item.client_name}`);
-
-    try {
-      const res = await fetch(fullUrl);
-      if (res.ok) {
-        const blob = await res.blob();
-        const pdfBlob = new Blob([blob], { type: 'application/pdf' });
-        const objectUrl = URL.createObjectURL(pdfBlob);
-        setPreviewModalUrl(objectUrl);
-        return;
-      }
-    } catch (err) {
-      console.warn('Direct blob fetch preview failed, fallback to fullUrl:', err);
-    }
-    setPreviewModalUrl(fullUrl);
-  };
-
-  const handleDeleteHistory = async (item) => {
-    if (!window.confirm(`Are you sure you want to delete Work Order ${item.job_no}? This action cannot be undone.`)) {
-      return;
-    }
-    try {
-      await deleteWorkOrderHistory(item.id);
-      setHistoryList(prev => prev.filter(h => h.id !== item.id));
-    } catch (err) {
-      alert(err.message || 'Failed to delete work order entry');
-    }
-  };
-
   // Field stats
   const confidenceFields = ['client_name', 'project_name', 'price_basis', 'freight', 'packing_forwarding', 'payment_terms'];
   let autoCount = 0, confirmCount = 0, manualCount = 0;
@@ -301,101 +241,16 @@ export default function WorkOrderSection({ token, confirmedEnquiries = [], preSe
 
   return (
     <div className="wo-container" style={{ padding: '1.5rem', color: 'var(--text-primary)' }}>
-      {/* Top Sub-Nav */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.8rem' }}>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <button 
-            className={`btn ${currentTab === 'generator' ? 'btn-primary' : 'btn-secondary'}`}
-            onClick={() => setCurrentTab('generator')}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer' }}
-          >
-            <Sparkles size={16} /> Work Order Generator
-          </button>
-          <button 
-            className={`btn ${currentTab === 'history' ? 'btn-primary' : 'btn-secondary'}`}
-            onClick={() => setCurrentTab('history')}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.5rem 1rem', borderRadius: '8px', cursor: 'pointer' }}
-          >
-            <History size={16} /> History Log
-          </button>
-        </div>
-
-        {preSelectedEnquiry && (
-          <div style={{ background: 'rgba(99, 102, 241, 0.15)', border: '1px solid var(--accent-primary)', padding: '0.4rem 0.8rem', borderRadius: '8px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span>Pre-filled from Enquiry: <strong>{preSelectedEnquiry.companyName || preSelectedEnquiry.clientName}</strong></span>
-            <button onClick={onClearPreSelected} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontWeight: 'bold' }}>✕</button>
-          </div>
-        )}
-      </div>
-
-      {/* HISTORY TAB VIEW */}
-      {currentTab === 'history' && (
-        <div>
-          <h3 style={{ marginBottom: '1rem' }}>Generated Work Orders History</h3>
-          {loadingHistory ? (
-            <div style={{ textAlign: 'center', padding: '2rem' }}><RefreshCw className="spin" size={24} /> Loading history...</div>
-          ) : historyList.length === 0 ? (
-            <p style={{ color: 'var(--text-secondary)' }}>No Work Orders have been generated yet.</p>
-          ) : (
-            <table style={{ width: '100%', borderCollapse: 'collapse', background: 'var(--bg-tertiary)', borderRadius: '12px', overflow: 'hidden' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid var(--border-color)', textAlign: 'left', color: 'var(--text-secondary)' }}>
-                  <th style={{ padding: '1rem' }}>Job No.</th>
-                  <th style={{ padding: '1rem' }}>Client Name</th>
-                  <th style={{ padding: '1rem' }}>Project Name</th>
-                  <th style={{ padding: '1rem' }}>Rev</th>
-                  <th style={{ padding: '1rem' }}>Date Generated</th>
-                  <th style={{ padding: '1rem', textAlign: 'right', minWidth: '320px' }}>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {historyList.map(item => (
-                  <tr key={item.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                    <td style={{ padding: '1rem', fontWeight: 'bold', color: 'var(--accent-primary, #6366f1)' }}>{item.job_no}</td>
-                    <td style={{ padding: '1rem' }}>{item.client_name}</td>
-                    <td style={{ padding: '1rem' }}>{item.project_name}</td>
-                    <td style={{ padding: '1rem' }}>Rev.{item.revision}</td>
-                    <td style={{ padding: '1rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{new Date(item.date).toLocaleDateString()}</td>
-                    <td style={{ padding: '1rem', textAlign: 'right', whiteSpace: 'nowrap' }}>
-                      <div style={{ display: 'inline-flex', gap: '0.5rem', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'nowrap' }}>
-                        <button 
-                          onClick={() => handlePreviewHistoryPdf(item)}
-                          className="btn-primary"
-                          style={{ padding: '0.45rem 0.85rem', fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', borderRadius: '6px', cursor: 'pointer', whiteSpace: 'nowrap', height: '34px', lineHeight: 1 }}
-                        >
-                          <Eye size={14} /> Preview
-                        </button>
-                        <a 
-                          href={`${import.meta.env.VITE_WO_API_BASE || 'http://localhost:8080'}${item.pdf_url}`}
-                          download={`${item.job_no}_WorkOrder.pdf`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="btn-secondary"
-                          style={{ padding: '0.45rem 0.85rem', fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', borderRadius: '6px', cursor: 'pointer', whiteSpace: 'nowrap', textDecoration: 'none', height: '34px', lineHeight: 1, color: 'var(--text-primary)', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}
-                        >
-                          <Download size={14} /> Download PDF
-                        </a>
-                        <button 
-                          onClick={() => handleDeleteHistory(item)}
-                          title="Delete Work Order"
-                          style={{ padding: '0.45rem 0.85rem', fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', borderRadius: '6px', cursor: 'pointer', whiteSpace: 'nowrap', height: '34px', lineHeight: 1, background: 'rgba(239, 68, 68, 0.12)', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)' }}
-                        >
-                          <Trash2 size={14} /> Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+      {preSelectedEnquiry && (
+        <div style={{ background: 'rgba(99, 102, 241, 0.15)', border: '1px solid var(--accent-primary)', padding: '0.6rem 1rem', borderRadius: '10px', fontSize: '0.9rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+          <span>Pre-filled from Enquiry: <strong>{preSelectedEnquiry.companyName || preSelectedEnquiry.clientName}</strong></span>
+          <button onClick={onClearPreSelected} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontWeight: 'bold', fontSize: '1.1rem' }}>✕</button>
         </div>
       )}
 
-      {/* GENERATOR TAB VIEW */}
-      {currentTab === 'generator' && (
-        <div>
-          {/* SUCCESS VIEW AFTER GENERATING WITH EMBEDDED PDF PREVIEW */}
+      {/* GENERATOR VIEW */}
+      <div>
+        {/* SUCCESS VIEW AFTER GENERATING WITH EMBEDDED PDF PREVIEW */}
           {downloadUrl ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
               {/* Success Header & Action Bar */}
@@ -743,7 +598,6 @@ export default function WorkOrderSection({ token, confirmedEnquiries = [], preSe
             </div>
           )}
         </div>
-      )}
       {/* Email Work Order Modal */}
       <SendWorkOrderMailModal 
         isOpen={isMailModalOpen}
@@ -752,35 +606,6 @@ export default function WorkOrderSection({ token, confirmedEnquiries = [], preSe
         downloadUrl={downloadUrl}
         token={token}
       />
-
-      {/* PDF Preview Modal for History Items */}
-      {previewModalUrl && (
-        <div className="modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100, padding: '1.5rem' }}>
-          <div style={{ background: 'var(--bg-secondary)', borderRadius: '16px', border: '1px solid var(--border-color)', width: '90vw', height: '90vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' }}>
-            <div style={{ padding: '1rem 1.5rem', background: 'var(--bg-tertiary)', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <FileText size={18} color="var(--accent-primary, #6366f1)" /> {previewModalTitle || 'Work Order PDF Preview'}
-              </h3>
-              <button onClick={() => setPreviewModalUrl(null)} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '1.4rem' }}>✕</button>
-            </div>
-            <div style={{ flex: 1, position: 'relative' }}>
-              <object 
-                data={previewModalUrl} 
-                type="application/pdf" 
-                width="100%" 
-                height="100%" 
-                style={{ border: 'none' }}
-              >
-                <iframe 
-                  src={previewModalUrl} 
-                  title="Work Order PDF Preview Modal" 
-                  style={{ width: '100%', height: '100%', border: 'none' }} 
-                />
-              </object>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
