@@ -403,7 +403,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
   const [statusFilter, setStatusFilter] = useState('');
   const [startDateFilter, setStartDateFilter] = useState('');
   const [endDateFilter, setEndDateFilter] = useState('');
-  const [dateSortOrder, setDateSortOrder] = useState('desc');
+  const [dateSortOrder, setDateSortOrder] = useState('');
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   
@@ -555,12 +555,20 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
       result = result.filter(enq => enq.date && enq.date !== '-' && enq.date <= endDateFilter);
     }
 
-    // Date Sorting (Ascending or Descending)
-    result.sort((a, b) => {
-      const timeA = a.date && a.date !== '-' ? new Date(a.date).getTime() : 0;
-      const timeB = b.date && b.date !== '-' ? new Date(b.date).getTime() : 0;
-      return dateSortOrder === 'asc' ? timeA - timeB : timeB - timeA;
-    });
+    // Date Sorting (Ascending or Descending) if user selected a sort order
+    if (dateSortOrder === 'asc') {
+      result.sort((a, b) => {
+        const timeA = a.date && a.date !== '-' ? new Date(a.date).getTime() : 0;
+        const timeB = b.date && b.date !== '-' ? new Date(b.date).getTime() : 0;
+        return timeA - timeB;
+      });
+    } else if (dateSortOrder === 'desc') {
+      result.sort((a, b) => {
+        const timeA = a.date && a.date !== '-' ? new Date(a.date).getTime() : 0;
+        const timeB = b.date && b.date !== '-' ? new Date(b.date).getTime() : 0;
+        return timeB - timeA;
+      });
+    }
 
     setFilteredEnquiries(result);
   }, [searchTerm, statusFilter, startDateFilter, endDateFilter, dateSortOrder, enquiries, activeTab]);
@@ -862,6 +870,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
               setStatusFilter('');
               setStartDateFilter('');
               setEndDateFilter('');
+              setDateSortOrder('');
               setShowDateDropdown(false);
               setShowStatusDropdown(false);
               setMobileNavOpen(false);
@@ -877,6 +886,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
               setStatusFilter('');
               setStartDateFilter('');
               setEndDateFilter('');
+              setDateSortOrder('');
               setShowDateDropdown(false);
               setShowStatusDropdown(false);
               setMobileNavOpen(false);
@@ -892,6 +902,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
               setStatusFilter('');
               setStartDateFilter('');
               setEndDateFilter('');
+              setDateSortOrder('');
               setShowDateDropdown(false);
               setShowStatusDropdown(false);
               setMobileNavOpen(false);
@@ -908,6 +919,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
               setStatusFilter('');
               setStartDateFilter('');
               setEndDateFilter('');
+              setDateSortOrder('');
               setShowDateDropdown(false);
               setShowStatusDropdown(false);
               setMobileNavOpen(false);
@@ -1082,7 +1094,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                 cursor: 'pointer', 
                                 padding: '2px', 
                                 fontSize: '0.85rem', 
-                                color: (startDateFilter || endDateFilter || dateSortOrder !== 'desc') ? 'var(--accent-primary)' : 'var(--text-muted)',
+                                color: (startDateFilter || endDateFilter || dateSortOrder !== '') ? 'var(--accent-primary)' : 'var(--text-muted)',
                                 display: 'inline-flex', 
                                 alignItems: 'center' 
                               }}
@@ -1103,6 +1115,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                   value={dateSortOrder}
                                   onChange={(e) => setDateSortOrder(e.target.value)}
                                 >
+                                  <option value="">None (Original Order)</option>
                                   <option value="desc">Descending (Newest First)</option>
                                   <option value="asc">Ascending (Oldest First)</option>
                                 </select>
