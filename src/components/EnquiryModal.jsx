@@ -434,15 +434,7 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
     }
 
     // Validations:
-    // 1. If status is Quotation Submitted, quotationNumber is required
-    if (formData.currentStatus === 'Quotation Submitted' && !formData.quotationNumber?.trim()) {
-      setWarningToast({ visible: true, message: "Please Enter the Quotation Number" });
-      setTimeout(() => {
-        setWarningToast({ visible: false, message: "" });
-      }, 2000);
-      return;
-    }
-    // 2. If status is Confirmed, poNumber is required
+    // 1. If status is Confirmed, poNumber is required
     if (formData.currentStatus === 'Confirmed' && !formData.poNumber?.trim()) {
       setWarningToast({ visible: true, message: "Please Enter the PO Number" });
       setTimeout(() => {
