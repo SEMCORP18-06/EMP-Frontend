@@ -527,7 +527,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
 
   // Handle local searching & filtering
   useEffect(() => {
-    let result = enquiries;
+    let result = [...enquiries];
 
     if (activeTab === 'milestones') {
       result = result.filter(enq => enq.currentStatus === 'Confirmed');
@@ -557,13 +557,13 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
 
     // Date Sorting (Ascending or Descending) if user selected a sort order
     if (dateSortOrder === 'asc') {
-      result.sort((a, b) => {
+      result = [...result].sort((a, b) => {
         const timeA = a.date && a.date !== '-' ? new Date(a.date).getTime() : 0;
         const timeB = b.date && b.date !== '-' ? new Date(b.date).getTime() : 0;
         return timeA - timeB;
       });
     } else if (dateSortOrder === 'desc') {
-      result.sort((a, b) => {
+      result = [...result].sort((a, b) => {
         const timeA = a.date && a.date !== '-' ? new Date(a.date).getTime() : 0;
         const timeB = b.date && b.date !== '-' ? new Date(b.date).getTime() : 0;
         return timeB - timeA;
