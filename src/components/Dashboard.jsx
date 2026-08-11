@@ -1069,24 +1069,8 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                         <th className="col-project-no">Project No.</th>
                       ) : (
                         <th>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
                             <span>Enq Date</span>
-                            <button
-                              onClick={() => setDateSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
-                              style={{
-                                background: 'none',
-                                border: 'none',
-                                cursor: 'pointer',
-                                padding: '2px',
-                                fontSize: '0.85rem',
-                                color: 'var(--accent-primary)',
-                                display: 'inline-flex',
-                                alignItems: 'center'
-                              }}
-                              title={`Sort Date: ${dateSortOrder === 'desc' ? 'Descending (Newest First)' : 'Ascending (Oldest First)'}`}
-                            >
-                              {dateSortOrder === 'desc' ? '🔽' : '🔼'}
-                            </button>
                             <button 
                               onClick={() => {
                                 setShowDateDropdown(!showDateDropdown);
@@ -1098,11 +1082,11 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                 cursor: 'pointer', 
                                 padding: '2px', 
                                 fontSize: '0.85rem', 
-                                color: (startDateFilter || endDateFilter) ? 'var(--accent-primary)' : 'var(--text-muted)',
+                                color: (startDateFilter || endDateFilter || dateSortOrder !== 'desc') ? 'var(--accent-primary)' : 'var(--text-muted)',
                                 display: 'inline-flex', 
                                 alignItems: 'center' 
                               }}
-                              title="Filter by Date Range & Sort"
+                              title="Filter & Sort by Date"
                             >
                               <svg viewBox="0 0 20 20" fill="currentColor" style={{ width: '16px', height: '16px' }}>
                                 <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" />
@@ -1119,8 +1103,8 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                   value={dateSortOrder}
                                   onChange={(e) => setDateSortOrder(e.target.value)}
                                 >
-                                  <option value="desc">🔽 Descending (Newest First)</option>
-                                  <option value="asc">🔼 Ascending (Oldest First)</option>
+                                  <option value="desc">Descending (Newest First)</option>
+                                  <option value="asc">Ascending (Oldest First)</option>
                                 </select>
                               </div>
                               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '6px' }}>
