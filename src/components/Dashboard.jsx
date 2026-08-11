@@ -403,6 +403,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
   const [statusFilter, setStatusFilter] = useState('');
   const [startDateFilter, setStartDateFilter] = useState('');
   const [endDateFilter, setEndDateFilter] = useState('');
+  const [dateSortOrder, setDateSortOrder] = useState('desc');
   const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [showStatusDropdown, setShowStatusDropdown] = useState(false);
   
@@ -554,8 +555,15 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
       result = result.filter(enq => enq.date && enq.date !== '-' && enq.date <= endDateFilter);
     }
 
+    // Date Sorting (Ascending or Descending)
+    result.sort((a, b) => {
+      const timeA = a.date && a.date !== '-' ? new Date(a.date).getTime() : 0;
+      const timeB = b.date && b.date !== '-' ? new Date(b.date).getTime() : 0;
+      return dateSortOrder === 'asc' ? timeA - timeB : timeB - timeA;
+    });
+
     setFilteredEnquiries(result);
-  }, [searchTerm, statusFilter, startDateFilter, endDateFilter, enquiries, activeTab]);
+  }, [searchTerm, statusFilter, startDateFilter, endDateFilter, dateSortOrder, enquiries, activeTab]);
 
   // Add or Edit Submission
   const handleEnquirySubmit = async (formData) => {
@@ -1061,8 +1069,24 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                         <th className="col-project-no">Project No.</th>
                       ) : (
                         <th>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
                             <span>Enq Date</span>
+                            <button
+                              onClick={() => setDateSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
+                              style={{
+                                background: 'none',
+                                border: 'none',
+                                cursor: 'pointer',
+                                padding: '2px',
+                                fontSize: '0.85rem',
+                                color: 'var(--accent-primary)',
+                                display: 'inline-flex',
+                                alignItems: 'center'
+                              }}
+                              title={`Sort Date: ${dateSortOrder === 'desc' ? 'Descending (Newest First)' : 'Ascending (Oldest First)'}`}
+                            >
+                              {dateSortOrder === 'desc' ? '🔽' : '🔼'}
+                            </button>
                             <button 
                               onClick={() => {
                                 setShowDateDropdown(!showDateDropdown);
@@ -1078,7 +1102,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                 display: 'inline-flex', 
                                 alignItems: 'center' 
                               }}
-                              title="Filter by Date"
+                              title="Filter by Date Range & Sort"
                             >
                               <svg viewBox="0 0 20 20" fill="currentColor" style={{ width: '16px', height: '16px' }}>
                                 <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" />
@@ -1087,7 +1111,19 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                           </div>
                           {showDateDropdown && (
                             <div className="header-filter-dropdown">
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                                <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Sort Order:</label>
+                                <select 
+                                  className="select-filter"
+                                  style={{ width: '100%' }}
+                                  value={dateSortOrder}
+                                  onChange={(e) => setDateSortOrder(e.target.value)}
+                                >
+                                  <option value="desc">🔽 Descending (Newest First)</option>
+                                  <option value="asc">🔼 Ascending (Oldest First)</option>
+                                </select>
+                              </div>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '6px' }}>
                                 <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>From Date:</label>
                                 <input 
                                   type="date" 
@@ -1097,7 +1133,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                   onChange={(e) => setStartDateFilter(e.target.value)}
                                 />
                               </div>
-                              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                                 <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>To Date:</label>
                                 <input 
                                   type="date" 
@@ -1107,12 +1143,12 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                   onChange={(e) => setEndDateFilter(e.target.value)}
                                 />
                               </div>
-                              <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                              <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
                                 <button 
-                                  onClick={() => { setStartDateFilter(''); setEndDateFilter(''); setShowDateDropdown(false); }}
+                                  onClick={() => { setStartDateFilter(''); setEndDateFilter(''); setDateSortOrder('desc'); setShowDateDropdown(false); }}
                                   style={{ flex: 1, padding: '6px 12px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'transparent', color: 'var(--text-primary)', cursor: 'pointer', fontSize: '0.8rem' }}
                                 >
-                                  Clear
+                                  Reset
                                 </button>
                                 <button 
                                   onClick={() => setShowDateDropdown(false)}
