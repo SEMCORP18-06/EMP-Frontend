@@ -186,6 +186,26 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
     }
   };
 
+  const fetchNextQuotationNumber = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_BASE}/next-quotation-number`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.nextQuotationNumber) {
+          setFormData(prev => ({
+            ...prev,
+            quotationNumber: data.nextQuotationNumber
+          }));
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching next quotation number:', err);
+    }
+  };
+
   useEffect(() => {
     if (isOpen && token) {
       fetchEquipments();
@@ -331,39 +351,42 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
   };
 
   useEffect(() => {
-    if (enquiry) {
-      setFormData({
-        date: enquiry.date || '',
-        quotationNumber: enquiry.quotationNumber || '',
-        clientName: enquiry.clientName || '',
-        companyName: enquiry.companyName || '',
-        enquiryDetails: enquiry.enquiryDetails || '',
-        majorEquipments: enquiry.majorEquipments || '',
-        enquirySource: enquiry.enquirySource || '',
-        fpr: enquiry.fpr || '',
-        mailId: enquiry.mailId || '',
-        contactCountryCode: enquiry.contactCountryCode || '+91',
-        contactNumber: enquiry.contactNumber || '',
-        currentStatus: enquiry.currentStatus || 'Costing',
-        offerSubmittedDate: enquiry.offerSubmittedDate || '',
-        poNumber: enquiry.poNumber || '',
-        expectedDateOfDispatch: enquiry.expectedDateOfDispatch || '',
-        projectEngineer: enquiry.projectEngineer || '',
-        projectNumber: enquiry.projectNumber || '',
-        followUpComments: enquiry.followUpComments || ''
-      });
-    } else {
-      setFormData({
-        ...INITIAL_STATE,
-        date: new Date().toISOString().split('T')[0],
-        contactCountryCode: '+91',
-        contactNumber: '',
-        fpr: '',
-        expectedDateOfDispatch: '',
-        projectEngineer: ''
-      });
+    if (isOpen) {
+      if (enquiry) {
+        setFormData({
+          date: enquiry.date || '',
+          quotationNumber: enquiry.quotationNumber || '',
+          clientName: enquiry.clientName || '',
+          companyName: enquiry.companyName || '',
+          enquiryDetails: enquiry.enquiryDetails || '',
+          majorEquipments: enquiry.majorEquipments || '',
+          enquirySource: enquiry.enquirySource || '',
+          fpr: enquiry.fpr || '',
+          mailId: enquiry.mailId || '',
+          contactCountryCode: enquiry.contactCountryCode || '+91',
+          contactNumber: enquiry.contactNumber || '',
+          currentStatus: enquiry.currentStatus || 'Costing',
+          offerSubmittedDate: enquiry.offerSubmittedDate || '',
+          poNumber: enquiry.poNumber || '',
+          expectedDateOfDispatch: enquiry.expectedDateOfDispatch || '',
+          projectEngineer: enquiry.projectEngineer || '',
+          projectNumber: enquiry.projectNumber || '',
+          followUpComments: enquiry.followUpComments || ''
+        });
+      } else {
+        setFormData({
+          ...INITIAL_STATE,
+          date: new Date().toISOString().split('T')[0],
+          contactCountryCode: '+91',
+          contactNumber: '',
+          fpr: '',
+          expectedDateOfDispatch: '',
+          projectEngineer: ''
+        });
+        fetchNextQuotationNumber();
+      }
     }
-  }, [enquiry, isOpen]);
+  }, [enquiry, isOpen, token]);
 
   if (!isOpen) return null;
 
