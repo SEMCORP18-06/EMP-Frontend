@@ -392,11 +392,16 @@ export default function EnquiryModal({ isOpen, onClose, onSubmit, enquiry, isAdm
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (name === 'currentStatus' && (value === 'Offer submitted' || value === 'Revise Offer')) {
+    if (name === 'currentStatus') {
+      if (value === 'Quotation Submitted' || value === 'Offer submitted' || value === 'Revise Offer') {
+        if (!formData.quotationNumber || !formData.quotationNumber.trim() || formData.quotationNumber === '-') {
+          fetchNextQuotationNumber();
+        }
+      }
       setFormData(prev => ({
         ...prev,
         currentStatus: value,
-        offerSubmittedDate: prev.offerSubmittedDate || new Date().toISOString().split('T')[0]
+        offerSubmittedDate: (value === 'Offer submitted' || value === 'Revise Offer') ? (prev.offerSubmittedDate || new Date().toISOString().split('T')[0]) : prev.offerSubmittedDate
       }));
     } else {
       setFormData(prev => ({
