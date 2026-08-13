@@ -57,60 +57,97 @@ export default function GanttModal({ isOpen, onClose, enquiry, showSuccessToast 
     setHoveredMilestone(null);
   };
 
-  const handleFileChange = (e) => {
+  const compressImage = (file) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const maxDim = 1200;
+
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          resolve(dataUrl);
+        };
+        img.onerror = () => resolve(event.target.result);
+        img.src = event.target.result;
+      };
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFileChange = async (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
 
-    files.forEach(file => {
+    for (const file of files) {
       if (!file.type.startsWith('image/')) {
         setErrorMsg('Only image files are allowed.');
-        return;
+        continue;
       }
-      
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImages(prev => [
-          ...prev,
-          {
-            name: file.name,
-            data: reader.result
-          }
-        ]);
-      };
-      reader.onerror = () => {
-        setErrorMsg('Failed to read image file.');
-      };
-      reader.readAsDataURL(file);
-    });
+      try {
+        const compressedData = await compressImage(file);
+        if (compressedData) {
+          setImages(prev => [
+            ...prev,
+            {
+              name: file.name,
+              data: compressedData
+            }
+          ]);
+        }
+      } catch (err) {
+        setErrorMsg('Failed to process image file.');
+      }
+    }
   };
 
   const handleDragOver = (e) => {
     e.preventDefault();
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = async (e) => {
     e.preventDefault();
     const files = Array.from(e.dataTransfer.files);
     if (!files.length) return;
 
-    files.forEach(file => {
+    for (const file of files) {
       if (!file.type.startsWith('image/')) {
         setErrorMsg('Only image files are allowed.');
-        return;
+        continue;
       }
-      
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImages(prev => [
-          ...prev,
-          {
-            name: file.name,
-            data: reader.result
-          }
-        ]);
-      };
-      reader.readAsDataURL(file);
-    });
+      try {
+        const compressedData = await compressImage(file);
+        if (compressedData) {
+          setImages(prev => [
+            ...prev,
+            {
+              name: file.name,
+              data: compressedData
+            }
+          ]);
+        }
+      } catch (err) {
+        setErrorMsg('Failed to process image file.');
+      }
+    }
   };
 
   const removeImage = (indexToRemove) => {
@@ -121,6 +158,12 @@ export default function GanttModal({ isOpen, onClose, enquiry, showSuccessToast 
     e.preventDefault();
     if (!emailTo || !emailTo.trim()) {
       setErrorMsg('Recipient email is required.');
+      return;
+    }
+
+    const totalImageBytes = images.reduce((acc, img) => acc + (img.data ? img.data.length : 0), 0);
+    if (totalImageBytes > 3.5 * 1024 * 1024) {
+      setErrorMsg('Total image size is too large (exceeds 3.5 MB). Please remove one or more images before sending.');
       return;
     }
 
