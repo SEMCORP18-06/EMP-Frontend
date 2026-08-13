@@ -8,7 +8,6 @@ import DashboardAnalytics from './DashboardAnalytics';
 import UserManagementPanel from './UserManagementPanel';
 import GanttModal from './GanttModal';
 import SendMailModal from './SendMailModal';
-import WorkOrderSection from './WorkOrderSection';
 import { API_BASE } from '../config';
 import { ClipboardList, BarChart3, FileText, Mail, Pencil, Trash2 } from 'lucide-react';
 
@@ -395,8 +394,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
   const [error, setError] = useState('');
   
   // Navigation tab state
-  const [activeTab, setActiveTab] = useState('enquiries'); // 'enquiries', 'milestones', 'analytics' or 'workorders'
-  const [preSelectedEnquiry, setPreSelectedEnquiry] = useState(null);
+  const [activeTab, setActiveTab] = useState('enquiries'); // 'enquiries', 'milestones', 'analytics'
   
   // Search & Filter state
   const [searchTerm, setSearchTerm] = useState('');
@@ -910,23 +908,6 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
           >
             Dashboard
           </button>
-          <button 
-            className={`nav-link ${activeTab === 'workorders' ? 'active' : ''}`}
-            onClick={() => {
-              setActiveTab('workorders');
-              setPreSelectedEnquiry(null);
-              setSearchTerm('');
-              setStatusFilter('');
-              setStartDateFilter('');
-              setEndDateFilter('');
-              setDateSortOrder('');
-              setShowDateDropdown(false);
-              setShowStatusDropdown(false);
-              setMobileNavOpen(false);
-            }}
-          >
-            Work Orders
-          </button>
         </nav>
 
         <div className="user-profile">
@@ -952,7 +933,7 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
         {/* Title Bar */}
         <div className="dashboard-title-bar">
           <h2 className="dashboard-title">
-            {activeTab === 'analytics' ? 'Analytics Dashboard' : activeTab === 'workorders' ? 'Work Order Generation' : activeTab === 'enquiries' ? 'Enquiries Database' : activeTab === 'users' ? 'User Management' : 'Confirmed Orders'}
+            {activeTab === 'analytics' ? 'Analytics Dashboard' : activeTab === 'enquiries' ? 'Enquiries Database' : activeTab === 'users' ? 'User Management' : 'Confirmed Orders'}
           </h2>
           {(activeTab === 'enquiries' || activeTab === 'users') && (
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
@@ -1056,13 +1037,6 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
           <DashboardAnalytics enquiries={enquiries} />
         ) : activeTab === 'users' ? (
           <UserManagementPanel token={token} currentUsername={username} />
-        ) : activeTab === 'workorders' ? (
-          <WorkOrderSection 
-            token={token}
-            confirmedEnquiries={enquiries.filter(e => e.currentStatus === 'Confirmed')}
-            preSelectedEnquiry={preSelectedEnquiry}
-            onClearPreSelected={() => setPreSelectedEnquiry(null)}
-          />
         ) : (
           <div className="table-card">
             {error && <div style={{ padding: '24px', color: '#fca5a5' }}>{error}</div>}
@@ -1383,16 +1357,6 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                     >
                                       <Mail size={15} />
                                     </button>
-                                    <button 
-                                      className="action-btn wo-btn"
-                                      title="Generate Work Order"
-                                      onClick={() => {
-                                        setPreSelectedEnquiry(enq);
-                                        setActiveTab('workorders');
-                                      }}
-                                    >
-                                      <FileText size={15} />
-                                    </button>
                                   </>
                                 )}
                               </>
@@ -1417,16 +1381,6 @@ export default function Dashboard({ token, userRole, username, displayName, onLo
                                   title="Gantt Chart Timeline"
                                 >
                                   <BarChart3 size={16} />
-                                </button>
-                                <button 
-                                  className="action-btn wo-btn"
-                                  onClick={() => {
-                                    setPreSelectedEnquiry(enq);
-                                    setActiveTab('workorders');
-                                  }}
-                                  title="Generate Work Order"
-                                >
-                                  <FileText size={16} />
                                 </button>
                               </div>
                             )}
